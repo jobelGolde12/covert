@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" role="img" aria-label="Modern architectural facade with a red door">
+  <rect width="640" height="800" fill="#E9E9E6"/>
+  <!-- sky -->
+  <rect width="640" height="300" fill="#F7F7F5"/>
+  <!-- building mass -->
+  <rect x="40" y="120" width="560" height="660" fill="#171717"/>
+  <rect x="40" y="120" width="560" height="24" fill="#111111"/>
+  <!-- windows -->
+  <g fill="#F7F7F5" opacity="0.9">
+    <rect x="90" y="180" width="90" height="130"/>
+    <rect x="220" y="180" width="90" height="130"/>
+    <rect x="350" y="180" width="90" height="130"/>
+    <rect x="480" y="180" width="70" height="130"/>
+    <rect x="90" y="350" width="90" height="130"/>
+    <rect x="220" y="350" width="90" height="130"/>
+    <rect x="480" y="350" width="70" height="130"/>
+    <rect x="90" y="520" width="90" height="100"/>
+    <rect x="220" y="520" width="90" height="100"/>
+  </g>
+  <!-- red door -->
+  <rect x="400" y="480" width="110" height="300" fill="#C8102E"/>
+  <circle cx="490" cy="630" r="6" fill="#FFFFFF"/>
+  <!-- ground -->
+  <rect y="780" width="640" height="20" fill="#171717"/>
+  <!-- fine grid lines -->
+  <g stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1">
+    <line x1="40" y1="120" x2="40" y2="780"/>
+    <line x1="600" y1="120" x2="600" y2="780"/>
+  </g>
+</svg>

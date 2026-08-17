@@ -1,0 +1,14 @@
+packages:
+  - "."
+
+# Local dev machine — allow native build scripts (Prisma engines, esbuild).
+# Prevents pnpm 11's implicit install check from failing on ignored builds.
+dangerouslyAllowAllBuilds: true
+
+onlyBuiltDependencies:
+  - "@prisma/client"
+  - "@prisma/engines"
+  - "prisma"
+  - "esbuild"
+  - "msgpackr-extract"
+  - "unrs-resolver"

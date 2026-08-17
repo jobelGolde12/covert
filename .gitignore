@@ -1,0 +1,27 @@
+# deps
+node_modules/
+
+# next
+.next/
+out/
+
+# env
+.env
+.env.local
+.env*.local
+
+# data (local storage + dev db)
+data/
+*.db
+*.db-journal
+
+# build output
+dist/
+coverage/
+
+# misc
+.DS_Store
+*.log
+
+# Prompts
+prompts/*

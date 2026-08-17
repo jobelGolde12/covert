@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------ design tokens
+   Single source of truth for theme values (design.md §3, §4, §28, §41).
+   Tailwind reads these via `rgb(var(--color-*) / <alpha-value>)` in
+   tailwind.config.ts — the values are space-separated RGB channels so the
+   opacity modifier (`bg-accent/40`) compiles to `rgb(var(--color-accent) / .4)`.
+   Use `rgb(var(--color-*))` in plain CSS; never use the var directly. */
+:root {
+  --color-background: 255 255 255;
+  --color-surface: 248 248 246;
+  --color-foreground: 23 23 23;
+  --color-muted: 119 119 119;
+  --color-light: 160 160 160;
+  --color-border: 232 232 232;
+  --color-accent: 200 16 46;
+  --color-accent-hover: 159 13 36;
+  --color-dark: 17 17 17;
+  --color-white: 255 255 255;
+
+  --font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+
+  --shadow-menu: 0 8px 30px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ base */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background text-foreground font-sans antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(var(--color-accent));
+  color: rgb(var(--color-white));
+}
+
+/* ----------------------------------------------------------------- focus */
+
+:focus-visible {
+  outline: 2px solid rgb(var(--color-accent));
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ----------------------------------------------------------- loading state
+   Shimmer placeholder for skeletons; animation is neutralized by the
+   reduced-motion block below, leaving a static surface tint. */
+.skeleton {
+  background-image: linear-gradient(
+    100deg,
+    rgb(var(--color-border)) 40%,
+    rgb(var(--color-surface)) 50%,
+    rgb(var(--color-border)) 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ------------------------------------------------------------ annotation
+   design.md §16 — one small art-directed editorial note */
+.handwritten {
+  font-family: "Segoe Print", "Comic Sans MS", "Bradley Hand", cursive;
+  transform: rotate(-4deg);
+}
+
+/* ------------------------------------------------------- reduced motion
+   design.md §27 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------- small utilities */
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.hairline {
+  @apply border-border;
+}

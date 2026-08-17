@@ -1,0 +1,172 @@
+// Folio — Prisma schema (SQLite for local dev; Turso/libSQL in production).
+// Mirrors documentation/database-schema.md. MVP subset: files, jobs, tasks,
+// conversions, usage. User/ApiKey/Webhook tables are reserved for Phase 2.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth (Phase 2 — NextAuth.js). Kept minimal; unused by MVP routes.
+// ---------------------------------------------------------------------------
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  role      String   @default("user")
+  plan      String   @default("free")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  files    File[]
+  jobs     Job[]
+  apiKeys  ApiKey[]
+}
+
+model ApiKey {
+  id         String    @id @default(uuid())
+  userId     String
+  name       String
+  keyPrefix  String
+  keyHash    String    @unique
+  scopes     String
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Files — immutable objects; row = metadata + lifecycle
+// ---------------------------------------------------------------------------
+
+model File {
+  id             String    @id @default(uuid())
+  userId         String?
+  storageKey     String    @unique
+  bucket         String    @default("local")
+  filename       String
+  mimeType       String
+  sizeBytes      Int
+  checksumSha256 String?
+  pageCount      Int?
+  status         String    @default("uploading") // uploading | ready | processing | done | error | expired
+  source         String    @default("upload")
+  retentionUntil DateTime
+  createdAt      DateTime  @default(now())
+  deletedAt      DateTime?
+
+  user    User?   @relation(fields: [userId], references: [id])
+  inputs  Task[]  @relation("TaskInput")
+  outputs Task[]  @relation("TaskOutput")
+
+  @@index([userId, createdAt])
+  @@index([status, retentionUntil])
+  @@index([checksumSha256])
+}
+
+// ---------------------------------------------------------------------------
+// Jobs & Tasks
+// ---------------------------------------------------------------------------
+
+model Job {
+  id            String    @id @default(uuid())
+  userId        String?
+  status        String    @default("queued") // queued | processing | done | error | cancelled
+  priority      Int       @default(0)
+  idempotencyKey String?  @unique
+  errorCode     String?
+  errorMessage  String?
+  creditsCharged Int      @default(0)
+  timingsMs     String?
+  createdAt     DateTime  @default(now())
+  startedAt     DateTime?
+  endedAt       DateTime?
+
+  user  User?  @relation(fields: [userId], references: [id])
+  tasks Task[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model Task {
+  id           String    @id @default(uuid())
+  jobId        String
+  operation    String    // convert | optimize | merge | split | rotate | watermark | ocr
+  engine       String?
+  engineVersion String?
+  inputFileId  String?
+  outputFileId String?
+  options      String?
+  status       String    @default("waiting") // waiting | processing | finished | error | cancelled
+  progress     Int       @default(0)
+  errorCode    String?
+  errorMessage String?
+  retries      Int       @default(0)
+  createdAt    DateTime  @default(now())
+  startedAt    DateTime?
+  endedAt      DateTime?
+
+  job    Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  input  File? @relation("TaskInput", fields: [inputFileId], references: [id])
+  output File? @relation("TaskOutput", fields: [outputFileId], references: [id])
+
+  @@index([jobId])
+  @@index([status, createdAt])
+  @@index([inputFileId])
+}
+
+// ---------------------------------------------------------------------------
+// Conversion history
+// ---------------------------------------------------------------------------
+
+model Conversion {
+  id           String    @id @default(uuid())
+  userId       String?
+  jobId        String?
+  sourceFormat String
+  targetFormat String
+  engine       String
+  location     String
+  status       String
+  inputBytes   Int?
+  outputBytes  Int?
+  durationMs   Int?
+  creditsUsed  Int       @default(1)
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([sourceFormat, targetFormat])
+}
+
+// ---------------------------------------------------------------------------
+// Metering
+// ---------------------------------------------------------------------------
+
+model UsageRecord {
+  id          String   @id @default(uuid())
+  userId      String?
+  date        String
+  conversions Int      @default(0)
+  bytesIn     Int      @default(0)
+  bytesOut    Int      @default(0)
+  creditsUsed Int      @default(0)
+  apiCalls    Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([date])
+}
