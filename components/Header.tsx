@@ -85,11 +85,11 @@ export function Header() {
   const isActive = (href: string) => href === "/convert" && pathname === "/convert";
 
   return (
-    <header className="sticky top-0 z-40 border-b hairline bg-background/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b hairline bg-background/95 backdrop-blur" role="banner">
       <div className="mx-auto flex h-16 max-w-container items-center justify-between px-5 md:px-10 lg:px-16">
         <Logo />
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
           {NAV.map((item) => {
             const active = isActive(item.href);
             return (
@@ -97,7 +97,7 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`text-nav transition-colors duration-fast ${
+                className={`text-nav transition-colors duration-fast focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent ${
                   active ? "text-accent" : "text-muted hover:text-foreground"
                 }`}
               >
@@ -138,7 +138,7 @@ export function Header() {
           id="mobile-nav"
           ref={panelRef}
           className="border-t hairline bg-background md:hidden"
-          aria-label="Mobile"
+          aria-label="Mobile navigation"
         >
           <div className="mx-auto flex max-w-container flex-col gap-1 px-5 py-4">
             {NAV.map((item) => (

@@ -39,7 +39,7 @@ const GROUPS = [
 
 export function Footer() {
   return (
-    <footer className="bg-dark text-white/70">
+    <footer className="bg-dark text-white/70" role="contentinfo">
       <div className="mx-auto max-w-container px-5 md:px-10 lg:px-16 py-16 grid grid-cols-2 lg:grid-cols-5 gap-10">
         <div className="col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-4">
@@ -51,12 +51,16 @@ export function Footer() {
           </p>
         </div>
         {GROUPS.map((group) => (
-          <nav key={group.title} aria-label={group.title}>
+          <nav key={group.title} aria-label={`${group.title} links`}>
             <h3 className="text-nav uppercase tracking-[0.08em] text-white/40 mb-4">{group.title}</h3>
             <ul className="space-y-2">
               {group.links.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-body-sm hover:text-white transition-colors duration-fast">
+                  <Link
+                    href={link.href}
+                    className="text-body-sm hover:text-white transition-colors duration-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    {...(link.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  >
                     {link.label}
                   </Link>
                 </li>

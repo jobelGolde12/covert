@@ -14,7 +14,7 @@ const FADE = "animate-fade-up";
  */
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden" aria-labelledby="hero-heading">
       <div className="relative mx-auto max-w-container px-5 md:px-10 lg:px-16 pt-16 md:pt-24 pb-16 md:pb-24">
         <div className="flex flex-col items-center text-center">
           {/* text — centered */}
@@ -26,6 +26,7 @@ export function Hero() {
               Document conversion
             </p>
             <h1
+              id="hero-heading"
               className={`${FADE} text-hero text-foreground`}
               style={{ animationDelay: "140ms" }}
             >
@@ -40,7 +41,7 @@ export function Hero() {
               style={{ animationDelay: "240ms" }}
             >
               Word, PDF, PowerPoint, Excel and more — in your browser. The tools you use most
-              never leave your device.
+              never leave your device. No sign-up required.
             </p>
             <div
               className={`${FADE} mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4`}
@@ -51,7 +52,7 @@ export function Hero() {
               </Button>
               <Link
                 href="#formats"
-                className="group inline-flex items-center gap-2 text-btn text-foreground transition-colors duration-fast hover:text-muted"
+                className="group inline-flex items-center gap-2 text-btn text-foreground transition-colors duration-fast hover:text-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
               >
                 Browse formats
                 <Icon
@@ -61,6 +62,23 @@ export function Hero() {
                   className="transition-transform duration-fast group-hover:translate-x-1"
                 />
               </Link>
+            </div>
+            <div
+              className={`${FADE} mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-light`}
+              style={{ animationDelay: "440ms" }}
+            >
+              <span className="flex items-center gap-1.5">
+                <Icon name="shield-check" size={12} aria-hidden="true" className="text-accent" />
+                Privacy-first
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Icon name="device" size={12} aria-hidden="true" className="text-accent" />
+                On-device processing
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Icon name="lock" size={12} aria-hidden="true" className="text-accent" />
+                Auto-deleted
+              </span>
             </div>
           </div>
         </div>

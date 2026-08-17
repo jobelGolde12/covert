@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "The terms that govern your use of Convert's document conversion service.",
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 export default function TermsPage() {

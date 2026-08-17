@@ -6,6 +6,15 @@ export const metadata: Metadata = {
   title: "Convert documents",
   description:
     "Convert Word, PDF, PowerPoint, Excel, images, HTML and Markdown. Browser-side tools run on your device; server conversions are auto-deleted.",
+  alternates: {
+    canonical: "/convert",
+  },
+  openGraph: {
+    title: "Convert documents — Convert",
+    description:
+      "Convert Word, PDF, PowerPoint, Excel, images, HTML and Markdown. Browser-side tools run on your device; server conversions are auto-deleted.",
+    type: "website",
+  },
 };
 
 export default function ConvertPage() {

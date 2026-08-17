@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Accessibility",
   description:
     "Convert's commitment to an accessible experience — keyboard support, screen readers, reduced motion, and WCAG 2.1 AA-conscious design.",
+  alternates: {
+    canonical: "/accessibility",
+  },
 };
 
 export default function AccessibilityPage() {

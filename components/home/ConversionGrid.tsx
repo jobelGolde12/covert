@@ -56,7 +56,7 @@ export function ConversionGrid() {
             </h2>
           </div>
           <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-xl px-5 py-4 border border-border/50 max-w-[340px]">
-            <Icon name="shield-check" size={20} className="text-accent flex-shrink-0 mt-0.5" />
+            <Icon name="shield-check" size={20} className="text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
             <p className="text-body-sm text-muted">
               <span className="text-accent font-semibold">On your device</span> tools never upload a byte.
               <span className="block text-[11px] text-light mt-1">{conversions.length} conversions total</span>
@@ -72,18 +72,18 @@ export function ConversionGrid() {
                 {/* Category header with icon */}
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name={group.icon} size={16} className="text-accent" />
+                    <Icon name={group.icon} size={16} className="text-accent" aria-hidden="true" />
                   </div>
                   <h3 className="text-nav uppercase tracking-[0.12em] text-light">
                     {group.label}
                   </h3>
-                  <span className="ml-auto text-[10px] font-medium text-muted bg-white/5 px-2 py-0.5 rounded-full">
+                  <span className="ml-auto text-[10px] font-medium text-muted bg-white/5 px-2 py-0.5 rounded-full" aria-label={`${group.items.length} conversions`}>
                     {group.items.length}
                   </span>
                 </div>
                 
                 {/* Conversion items */}
-                <div className="border-t hairline divide-y divide-border/50">
+                <div className="border-t hairline divide-y divide-border/50" role="list">
                   {group.items.map((c, j) => (
                     <ConversionRow key={c.id} conversion={c} index={j + 1} />
                   ))}
@@ -97,7 +97,7 @@ export function ConversionGrid() {
         <div className="mt-16 md:mt-20 text-center">
           <Link
             href="/convert"
-            className="inline-flex items-center gap-2 text-body font-medium text-foreground hover:text-accent transition-colors duration-fast group"
+            className="inline-flex items-center gap-2 text-body font-medium text-foreground hover:text-accent transition-colors duration-fast group focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
             View all conversion tools
             <Icon
@@ -123,8 +123,8 @@ function ConversionRow({
   return (
     <Link
       href={`/convert?tool=${conversion.id}`}
-      className="group flex items-start justify-between gap-4 py-4 hover:bg-white/5 rounded-lg px-3 -mx-3 transition-all duration-200"
-      aria-label={`${conversion.label} — open converter`}
+      className="group flex items-start justify-between gap-4 py-4 hover:bg-white/5 rounded-lg px-3 -mx-3 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+      aria-label={`${conversion.shortLabel} — ${conversion.description}. Open converter.`}
     >
       <div className="flex min-w-0 gap-3 md:gap-4">
         <span

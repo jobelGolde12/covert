@@ -57,7 +57,7 @@ export function CookieBanner() {
           No trackers, no ads.{" "}
           <Link
             href="/privacy"
-            className="whitespace-nowrap text-foreground underline underline-offset-4 transition-colors duration-fast hover:text-accent"
+            className="whitespace-nowrap text-foreground underline underline-offset-4 transition-colors duration-fast hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Privacy policy
           </Link>

@@ -24,11 +24,11 @@ export function FeatureStrip() {
       <div className="mx-auto max-w-container px-5 md:px-10 lg:px-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
           {features.map((f) => (
-            <div key={f.title} className="flex flex-col">
+            <article key={f.title} className="flex flex-col">
               <div className="w-6 h-[3px] bg-accent mb-5" aria-hidden="true" />
               <h3 className="text-h3 text-foreground mb-2">{f.title}</h3>
               <p className="text-body-sm text-muted flex-1">{f.body}</p>
-            </div>
+            </article>
           ))}
         </div>
       </div>
@@ -65,9 +65,14 @@ export function BrandStory() {
                 </Reveal>
               ))}
             </div>
-            <Button href="#formats" variant="link" iconRight="arrow-right" className="mt-8 md:mt-10">
-              Browse all formats
-            </Button>
+            <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-4">
+              <Button href="#formats" variant="link" iconRight="arrow-right">
+                Browse all formats
+              </Button>
+              <Button href="/convert" variant="outline" size="sm">
+                Try it now
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -97,6 +102,16 @@ export function QuoteCTA() {
             <Button href="#formats" variant="link" iconRight="arrow-right" className="w-full sm:w-auto">
               Browse formats
             </Button>
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-light">
+            <span className="flex items-center gap-1.5">
+              <Icon name="shield-check" size={12} aria-hidden="true" className="text-accent" />
+              No sign-up required
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Icon name="lock" size={12} aria-hidden="true" className="text-accent" />
+              Files auto-deleted
+            </span>
           </div>
         </div>
       </div>
@@ -131,10 +146,10 @@ export function FAQ() {
           <h2 id="faq-heading" className="text-h2 mb-8 md:mb-10">
             Questions, answered.
           </h2>
-          <div className="divide-y divide-border border-y hairline">
+          <div className="divide-y divide-border border-y hairline" role="list">
             {items.map((item) => (
-              <details key={item.q} className="group py-4 md:py-5">
-                <summary className="flex items-center justify-between cursor-pointer list-none text-body font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden">
+              <details key={item.q} className="group py-4 md:py-5" role="listitem">
+                <summary className="flex items-center justify-between cursor-pointer list-none text-body font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
                   <span className="pr-4">{item.q}</span>
                   <span className="flex items-center gap-2 flex-shrink-0">
                     <span className="sr-only group-open:hidden">Expand</span>
