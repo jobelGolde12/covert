@@ -59,7 +59,7 @@ export function ConversionGrid() {
             <Icon name="shield-check" size={20} className="text-accent flex-shrink-0 mt-0.5" />
             <p className="text-body-sm text-muted">
               <span className="text-accent font-semibold">On your device</span> tools never upload a byte.
-              <span className="block text-[11px] text-light mt-1">28 conversions total</span>
+              <span className="block text-[11px] text-light mt-1">{conversions.length} conversions total</span>
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export function ConversionGrid() {
                   <h3 className="text-nav uppercase tracking-[0.12em] text-light">
                     {group.label}
                   </h3>
-                  <span className="ml-auto text-[10px] font-medium text-light/50 bg-white/5 px-2 py-0.5 rounded-full">
+                  <span className="ml-auto text-[10px] font-medium text-muted bg-white/5 px-2 py-0.5 rounded-full">
                     {group.items.length}
                   </span>
                 </div>

@@ -10,7 +10,7 @@ import { Field, controlClass } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { runClientConversion } from "@/lib/client-engine/run";
-import { conversionsFrom, detectFormat, type ConversionDef } from "@/lib/conversions";
+import { conversionsFrom, detectFormat, conversionById, type ConversionDef } from "@/lib/conversions";
 import { uploadFile, createJob } from "@/lib/api-client";
 import { subscribeJob } from "@/lib/sse";
 import { newItemId, useConvertStore } from "@/lib/convert-store";
@@ -75,6 +75,17 @@ export function ConverterWorkspace() {
     [sourceFormat, catalog]
   );
 
+  const presetDef = useMemo(() => {
+    if (!presetTool || !catalog) return null;
+    return catalog.find((c) => c.id === presetTool) ?? null;
+  }, [presetTool, catalog]);
+
+  const presetHint = useMemo(() => {
+    if (!presetDef) return null;
+    const sourceLabel = presetDef.from.map((f) => f.toUpperCase()).join("/");
+    return { label: presetDef.shortLabel, accept: sourceLabel };
+  }, [presetDef]);
+
   const selectedDef: ConversionDef | undefined = useMemo(() => {
     const entry = catalog?.find((c) => c.id === selectedDefId);
     if (!entry) return undefined;
@@ -83,11 +94,18 @@ export function ConverterWorkspace() {
 
   // pre-select from ?tool= when files arrive with a matching source format
   useEffect(() => {
-    if (presetTool && sourceFormat) {
-      const match = catalog?.find((c) => c.id === presetTool && c.from.includes(sourceFormat));
-      if (match) setSelectedDefId(match.id);
+    if (presetTool && sourceFormat && catalog) {
+      const match = catalog.find((c) => c.id === presetTool && c.from.includes(sourceFormat));
+      if (match) {
+        setSelectedDefId(match.id);
+        setError(null);
+      } else if (presetDef) {
+        setError(
+          `This file is ${sourceFormat.toUpperCase()}, but ${presetDef.shortLabel} expects ${presetDef.from.map((f) => f.toUpperCase()).join(" or ")}. Choose a different conversion below.`
+        );
+      }
     }
-  }, [presetTool, sourceFormat, catalog]);
+  }, [presetTool, sourceFormat, catalog, presetDef]);
 
   // announce terminal states to screen readers
   const [announcement, setAnnouncement] = useState("");
@@ -222,7 +240,8 @@ export function ConverterWorkspace() {
     }
   };
 
-  const currentStep = files.length === 0 ? 1 : selectedDefId ? 3 : 2;
+  const formatPickerHidden = !!selectedDefId;
+  const currentStep = files.length === 0 ? 1 : selectedDefId ? 3 : formatPickerHidden ? 3 : 2;
 
   return (
     <div aria-busy={converting}>
@@ -252,7 +271,7 @@ export function ConverterWorkspace() {
         <>
           {/* step 1 — dropzone */}
           {files.length === 0 ? (
-            <Dropzone onFiles={handleFiles} disabled={converting} />
+            <Dropzone onFiles={handleFiles} disabled={converting} hint={presetHint} />
           ) : (
             <div>
               {/* step indicator */}
@@ -260,7 +279,10 @@ export function ConverterWorkspace() {
                 aria-label="Conversion steps"
                 className="mb-6 flex items-center gap-4 overflow-x-auto"
               >
-                {STEPS.map((s, i) => {
+                {STEPS.filter((s) => {
+                  if (formatPickerHidden && s.n === 2) return false;
+                  return true;
+                }).map((s, i) => {
                   const state = currentStep > s.n ? "done" : currentStep === s.n ? "current" : "todo";
                   return (
                     <li key={s.n} className="flex items-center gap-4 whitespace-nowrap">
@@ -325,56 +347,70 @@ export function ConverterWorkspace() {
                 </div>
               )}
 
-              {/* step 2 — format picker */}
-              <div className="mt-8">
-                <h2 className="mb-1 text-h3 text-foreground">Choose a format</h2>
-                <p className="mb-5 text-body-sm text-muted">
-                  {conversions.length} conversion{conversions.length === 1 ? "" : "s"} available for this
-                  file type.
-                </p>
-                {conversions.length === 0 ? (
-                  <p className="border border-border bg-surface px-4 py-3 text-body-sm text-muted">
-                    No conversions are available for this file type.
+              {/* step 2 — format picker (hidden when conversion is pre-selected) */}
+              {!selectedDefId && (
+                <div className="mt-8">
+                  <h2 className="mb-1 text-h3 text-foreground">Choose a format</h2>
+                  <p className="mb-5 text-body-sm text-muted">
+                    {conversions.length} conversion{conversions.length === 1 ? "" : "s"} available for this
+                    file type.
                   </p>
-                ) : (
-                  <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
-                    {conversions.map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedDefId(c.id);
-                          setOptions({});
-                        }}
-                        className={`group bg-background p-5 text-left transition-colors duration-fast ${
-                          selectedDefId === c.id ? "bg-white ring-1 ring-accent" : "hover:bg-white"
-                        }`}
-                        aria-pressed={selectedDefId === c.id}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-body font-medium text-foreground">{c.shortLabel}</span>
-                          {selectedDefId === c.id ? (
-                            <Icon name="check" size={16} aria-hidden="true" className="shrink-0 text-accent" />
-                          ) : (
-                            c.location === "client" && (
+                  {conversions.length === 0 ? (
+                    <p className="border border-border bg-surface px-4 py-3 text-body-sm text-muted">
+                      No conversions are available for this file type.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
+                      {conversions.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDefId(c.id);
+                            setOptions({});
+                          }}
+                          className="group bg-background p-5 text-left transition-colors duration-fast hover:bg-white"
+                          aria-pressed={false}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-body font-medium text-foreground">{c.shortLabel}</span>
+                            {c.location === "client" && (
                               <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-accent">
                                 On device
                               </span>
-                            )
-                          )}
-                        </div>
-                        <span className="mt-1 block text-[12px] text-muted">
-                          {CATEGORY_LABEL[c.category] ?? c.category}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                            )}
+                          </div>
+                          <span className="mt-1 block text-[12px] text-muted">
+                            {CATEGORY_LABEL[c.category] ?? c.category}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
-              {/* step 3 — options */}
+              {/* step 3 — selected conversion + options */}
               {selectedDef && (
-                <OptionControls defId={selectedDef.id} options={options} setOptions={setOptions} />
+                <>
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-2 border hairline bg-surface px-4 py-2.5 text-body font-medium text-foreground">
+                      <Icon name="check" size={14} aria-hidden="true" className="text-accent" />
+                      {selectedDef.shortLabel}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedDefId(null);
+                        setOptions({});
+                      }}
+                    >
+                      Change
+                    </Button>
+                  </div>
+                  <OptionControls defId={selectedDef.id} options={options} setOptions={setOptions} />
+                </>
               )}
 
               {/* step 4 — convert */}

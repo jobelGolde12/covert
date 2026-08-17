@@ -5,85 +5,110 @@ import { PolicyPage, PolicySection } from "@/components/legal/PolicyPage";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How Convert handles your documents: on-device conversions never upload a byte, and server-side files are encrypted and deleted automatically.",
+    "How Convert handles your documents, data, and privacy.",
 };
 
 export default function PrivacyPage() {
   return (
     <PolicyPage
       eyebrow="Privacy"
-      title="Your documents stay yours."
+      title="Privacy Policy"
       updated="Last updated: August 17, 2026"
     >
-      <PolicySection title="The short version">
+      <PolicySection title="Overview">
         <p>
-          Convert is a document converter built around a simple idea: the tools you use most
-          should never upload your files. The PDF tools you reach for every day run entirely in
-          your browser, and the conversions that do use our servers are encrypted and deleted
-          automatically — no account, no profile, no tracking.
+          Convert is a document conversion service. We collect the minimum data
+          needed to provide the service and do not sell or monetize your personal
+          information.
         </p>
       </PolicySection>
 
-      <PolicySection title="On-device tools never upload">
+      <PolicySection title="What we collect">
         <p>
-          Merge, split, rotate, watermark, compress, image → PDF and PDF → text, Markdown and
-          image all run in a Web Worker inside your browser. Your files are processed locally,
-          never transmitted, and work offline.
+          When you use Convert without signing in, we do not collect personally
+          identifiable information. Anonymous usage data (conversion count, file
+          type) is tracked via a browser-generated identifier to enforce rate
+          limits. If you create an account, we store your email address and
+          authentication credentials.
         </p>
       </PolicySection>
 
-      <PolicySection title="Server conversions">
+      <PolicySection title="How we use your data">
         <p>
-          Conversions between Office formats and PDF — as well as HTML, Markdown and text to
-          PDF — are processed by a LibreOffice worker on our servers. When you use one of
-          these:
+          Your data is used solely to operate the service: converting your files,
+          enforcing quotas, and communicating account-related information. We do
+          not use your documents for training, advertising, or any purpose other
+          than delivering the conversion you requested.
         </p>
+      </PolicySection>
+
+      <PolicySection title="File handling">
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            Files travel over TLS and are stored encrypted at rest while they wait to be
-            processed.
+            Uploaded files are processed and deleted automatically after
+            conversion. They are not stored long-term.
           </li>
           <li>
-            Each file is processed in an isolated container and its download link is
-            short-lived and signed.
+            Browser-side conversions never leave your device — no file data is
+            transmitted to our servers.
           </li>
           <li>
-            Uploaded files are deleted automatically — after 1 hour for anonymous visitors and
-            24 hours for free accounts. A background sweeper enforces this.
+            We do not access, read, or share your documents for any purpose
+            other than performing the conversion.
           </li>
         </ul>
       </PolicySection>
 
-      <PolicySection title="What we store">
+      <PolicySection title="Cookies and local storage">
         <p>
-          We store only what the service needs to work: file names and sizes, a record of each
-          conversion job, and anonymous usage counters used for rate limiting and the daily
-          conversion quota. No account is required, so there is no profile to build. Passwords
-          for password-protected PDFs are used in memory and never logged.
+          Convert uses essential cookies for session management and anonymous
+          rate-limit tracking. We do not use advertising or analytics cookies.
+          Local storage is used to remember your preferences and conversion
+          history on your device.
         </p>
       </PolicySection>
 
-      <PolicySection title="Cookies and tracking">
+      <PolicySection title="Third-party services">
         <p>
-          We set a single guest cookie that identifies your browser so the anonymous conversion
-          quota and rate limits can be enforced fairly. We do not use advertising cookies,
-          third-party trackers, or analytics.
+          Convert may use third-party infrastructure for file processing. These
+          providers are bound by data-processing agreements and are only
+          authorized to handle your files for the purpose of conversion. We do
+          not share personal data with third parties for marketing or analytics
+          purposes.
         </p>
       </PolicySection>
 
-      <PolicySection title="Retention and deletion">
+      <PolicySection title="Data security">
         <p>
-          Uploaded files are removed automatically by the retention sweeper (1 hour anonymous,
-          24 hours free accounts). Conversion job records are archived after 90 days and
-          contain no file contents. If you want a file gone sooner, simply don&apos;t download
-          it — it expires on its own.
+          We use industry-standard encryption in transit (TLS) and at rest. Access
+          controls, least-privilege policies, and regular security reviews are
+          part of our operational practices.
+        </p>
+      </PolicySection>
+
+      <PolicySection title="Your rights">
+        <p>
+          You can request access to, correction of, or deletion of any personal
+          data we hold about you. Because Convert collects very little personal
+          data, these requests are typically resolved quickly.
+        </p>
+      </PolicySection>
+
+      <PolicySection title="Changes to this policy">
+        <p>
+          We may update this policy as the service evolves. Material changes will
+          be reflected on this page with an updated date. Continued use of
+          Convert after changes constitutes acceptance of the revised policy.
         </p>
       </PolicySection>
 
       <PolicySection title="Contact">
         <p>
-          Questions about this policy or your data? Write to{" "}
-          <a href="mailto:support@convert.app" className="text-foreground underline underline-offset-4 hover:text-accent">
+          Questions about this privacy policy? Write to{" "}
+          <a
+            href="mailto:support@convert.app"
+            className="text-foreground underline underline-offset-4 hover:text-accent"
+          >
             support@convert.app
           </a>
           .

@@ -23,7 +23,7 @@ describe("local storage adapter", () => {
     expect(upload.method).toBe("PUT");
     expect(upload.uploadUrl).toContain("/api/v1/files/upload/put");
 
-    const url = new URL(upload.uploadUrl);
+    const url = new URL(upload.uploadUrl, "http://localhost");
     const key = url.searchParams.get("key")!;
     const exp = Number(url.searchParams.get("exp")!);
     const token = url.searchParams.get("token")!;

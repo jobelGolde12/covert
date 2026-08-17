@@ -134,13 +134,18 @@ export function FAQ() {
           <div className="divide-y divide-border border-y hairline">
             {items.map((item) => (
               <details key={item.q} className="group py-4 md:py-5">
-                <summary className="flex items-center justify-between cursor-pointer list-none text-body font-medium text-foreground marker:hidden">
+                <summary className="flex items-center justify-between cursor-pointer list-none text-body font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden">
                   <span className="pr-4">{item.q}</span>
-                  <Icon
-                    name="plus"
-                    size={16}
-                    className="text-muted transition-transform duration-fast group-open:rotate-45 flex-shrink-0"
-                  />
+                  <span className="flex items-center gap-2 flex-shrink-0">
+                    <span className="sr-only group-open:hidden">Expand</span>
+                    <span className="sr-only group-open:block">Collapse</span>
+                    <Icon
+                      name="plus"
+                      size={16}
+                      className="text-muted transition-transform duration-fast group-open:rotate-45"
+                      aria-hidden="true"
+                    />
+                  </span>
                 </summary>
                 <p className="mt-3 text-body-sm text-muted max-w-full lg:max-w-[620px]">{item.a}</p>
               </details>

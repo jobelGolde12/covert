@@ -1,6 +1,7 @@
 "use client";
 
 import { useDropzone } from "react-dropzone";
+import { Icon } from "@/components/ui/Icon";
 
 /**
  * Full-area file picker. The whole region is a single interactive control:
@@ -11,9 +12,11 @@ import { useDropzone } from "react-dropzone";
 export function Dropzone({
   onFiles,
   disabled,
+  hint,
 }: {
   onFiles: (files: File[]) => void;
   disabled?: boolean;
+  hint?: { label: string; accept: string } | null;
 }) {
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop: (accepted) => {
@@ -54,16 +57,36 @@ export function Dropzone({
     >
       <input {...getInputProps({ tabIndex: -1, "aria-hidden": "true" })} />
       <div className="mb-6 h-[3px] w-10 bg-accent" aria-hidden="true" />
-      <p className="text-h3 text-foreground">
-        {isDragActive ? "Drop it here" : "Drop your files here"}
-      </p>
-      <p className="mt-2 text-body-sm text-muted">
-        or <span className="text-accent underline underline-offset-2">browse your computer</span> — or
-        paste from clipboard
-      </p>
-      <p className="mt-6 text-[12px] text-muted">
-        Word · PDF · PowerPoint · Excel · images · HTML · Markdown · text
-      </p>
+      {hint ? (
+        <>
+          <p className="text-h3 text-foreground">
+            {isDragActive ? "Drop it here" : `Drop a ${hint.accept} to convert`}
+          </p>
+          <p className="mt-2 text-body-sm text-muted">
+            <span className="inline-flex items-center gap-1.5 font-medium text-accent">
+              <Icon name="arrow-right" size={14} aria-hidden="true" />
+              {hint.label}
+            </span>
+          </p>
+          <p className="mt-4 text-[12px] text-muted">
+            or <span className="text-accent underline underline-offset-2">browse your computer</span> — or
+            paste from clipboard
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="text-h3 text-foreground">
+            {isDragActive ? "Drop it here" : "Drop your files here"}
+          </p>
+          <p className="mt-2 text-body-sm text-muted">
+            or <span className="text-accent underline underline-offset-2">browse your computer</span> — or
+            paste from clipboard
+          </p>
+          <p className="mt-6 text-[12px] text-muted">
+            Word · PDF · PowerPoint · Excel · images · HTML · Markdown · text
+          </p>
+        </>
+      )}
     </div>
   );
 }

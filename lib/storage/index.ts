@@ -63,9 +63,8 @@ class LocalStorageAdapter implements StorageAdapter {
   async createUploadUrl(key: string, opts: { mimeType: string; sizeBytes: number }): Promise<UploadUrl> {
     const exp = Math.floor(Date.now() / 1000) + 15 * 60;
     const token = signLocalToken(key, exp);
-    const base = env.appUrl;
     return {
-      uploadUrl: `${base}/api/v1/files/upload/put?key=${encodeURIComponent(key)}&exp=${exp}&token=${token}`,
+      uploadUrl: `/api/v1/files/upload/put?key=${encodeURIComponent(key)}&exp=${exp}&token=${token}`,
       method: "PUT",
       headers: { "content-type": opts.mimeType, "x-convert-size": String(opts.sizeBytes) },
       expiresAt: new Date(exp * 1000).toISOString(),
@@ -86,7 +85,7 @@ class LocalStorageAdapter implements StorageAdapter {
   async createDownloadUrl(key: string, ttlSeconds = 60): Promise<string> {
     const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
     const token = signLocalToken(key, exp);
-    return `${env.appUrl}/api/v1/files/download?key=${encodeURIComponent(key)}&exp=${exp}&token=${token}`;
+    return `/api/v1/files/download?key=${encodeURIComponent(key)}&exp=${exp}&token=${token}`;
   }
 
   async getBuffer(key: string): Promise<Buffer> {

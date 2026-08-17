@@ -4,10 +4,10 @@ const GROUPS = [
   {
     title: "Convert",
     links: [
-      { label: "Word to PDF", href: "/convert" },
-      { label: "PDF to Word", href: "/convert" },
-      { label: "Merge PDF", href: "/convert" },
-      { label: "Compress PDF", href: "/convert" },
+      { label: "Word to PDF", href: "/convert?tool=docx-pdf" },
+      { label: "PDF to Word", href: "/convert?tool=pdf-docx" },
+      { label: "Merge PDF", href: "/convert?tool=pdf-merge" },
+      { label: "Compress PDF", href: "/convert?tool=pdf-compress" },
     ],
   },
   {
