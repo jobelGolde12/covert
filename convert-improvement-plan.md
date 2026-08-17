@@ -1,4 +1,4 @@
-# Folio Enhancement Plan
+# Convert Enhancement Plan
 
 ## Overview
 This plan addresses the critical bugs, security vulnerabilities, and performance improvements identified in the QA documentation, while also implementing UI/UX enhancements based on the design system.
@@ -57,7 +57,7 @@ This plan addresses the critical bugs, security vulnerabilities, and performance
 - **Files affected**: `lib/api.ts`
 - **Fix approach**: Add cookie to all identity responses
 - **Implementation**:
-  - Set `folio_guest` cookie in all responses
+  - Set `convert_guest` cookie in all responses
   - Use consistent cookie attributes (SameSite, Secure, etc.)
 
 ### SEC-03: Hard-coded default UPLOAD_SECRET

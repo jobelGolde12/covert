@@ -1,13 +1,13 @@
-# Folio — API Documentation
+# Convert — API Documentation
 
-> **Base URL:** `https://api.folio.app/v1` — regional endpoints: `https://us-east.api.folio.app/v1`, `https://eu-central.api.folio.app/v1`, `https://ap-southeast.api.folio.app/v1`
-> **Sandbox:** `https://sandbox.api.folio.app/v1` (unlimited jobs, whitelisted sample files, no credits consumed)
-> **WebSocket:** `wss://api.folio.app/v1/ws`
-> **Docs:** `docs.folio.app` · **OpenAPI spec:** `https://api.folio.app/v1/openapi.json`
+> **Base URL:** `https://api.convert.app/v1` — regional endpoints: `https://us-east.api.convert.app/v1`, `https://eu-central.api.convert.app/v1`, `https://ap-southeast.api.convert.app/v1`
+> **Sandbox:** `https://sandbox.api.convert.app/v1` (unlimited jobs, whitelisted sample files, no credits consumed)
+> **WebSocket:** `wss://api.convert.app/v1/ws`
+> **Docs:** `docs.convert.app` · **OpenAPI spec:** `https://api.convert.app/v1/openapi.json`
 >
 > All requests and responses are `application/json` unless noted. Timestamps are ISO-8601 UTC. The API is versioned via the URL prefix; breaking changes bump to `/v2` with a 12-month deprecation window.
 >
-> **Design compliance:** the developer dashboard (`app.folio.app/settings` — API keys, webhooks, usage) implements the `design.md` design system (Inter, `#FFFFFF`/`#F7F7F5` surfaces, `#171717` text, `#C8102E` accent, 12-col grid, 0–4px radii).
+> **Design compliance:** the developer dashboard (`app.convert.app/settings` — API keys, webhooks, usage) implements the `design.md` design system (Inter, `#FFFFFF`/`#F7F7F5` surfaces, `#171717` text, `#C8102E` accent, 12-col grid, 0–4px radii).
 
 ---
 
@@ -16,10 +16,10 @@
 ### 1.1 API Keys (recommended for servers)
 
 ```
-Authorization: Bearer folio_live_2x9k...full-key
+Authorization: Bearer convert_live_2x9k...full-key
 ```
 
-- Keys are minted in the dashboard: `POST /v1/api-keys`. Format: `folio_live_<32 random bytes base62>` (~40 chars). Sandbox keys: `folio_test_...`.
+- Keys are minted in the dashboard: `POST /v1/api-keys`. Format: `convert_live_<32 random bytes base62>` (~40 chars). Sandbox keys: `convert_test_...`.
 - **Scopes** restrict what a key can do:
 
 | Scope | Grants |
@@ -77,7 +77,7 @@ Retry-After: 60
 
 **Best practices** (mirrors CloudConvert's documented behavior):
 - Implement **exponential backoff with jitter** (e.g., `min(60, 2^n + rand(0,1000))ms`), max 4 attempts.
-- **Do not auto-retry** non-retryable errors (4xx). We internally retry retryable engine failures (5xx, timeouts) once with backoff — see `X-Folio-Retry-Count` on jobs.
+- **Do not auto-retry** non-retryable errors (4xx). We internally retry retryable engine failures (5xx, timeouts) once with backoff — see `X-Convert-Retry-Count` on jobs.
 - Respect `Retry-After`; hammering after 429 may escalate to temporary key suspension (first offense: 15 min).
 
 ---
@@ -147,7 +147,7 @@ Filter the catalog (e.g., `GET /v1/formats/pdf` → everything PDF can become; `
 {
   "data": {
     "fileId": "01HZX...",
-    "uploadUrl": "https://folio-files.<region>.r2.cloudflarestorage.com/files/01HZX.../01HZX....docx?X-Amz-Signature=...",
+    "uploadUrl": "https://convert-files.<region>.r2.cloudflarestorage.com/files/01HZX.../01HZX....docx?X-Amz-Signature=...",
     "expiresAt": "2026-08-16T12:05:00Z",
     "storageKey": "files/01HZX.../01HZX....docx"
   }
@@ -299,7 +299,7 @@ Only cancels jobs still `queued`/`processing`. In-flight engine work is killed v
 ## 7. Real-Time Progress (WebSocket)
 
 ```
-wss://api.folio.app/v1/ws?token=<jwt-or-apikey>
+wss://api.convert.app/v1/ws?token=<jwt-or-apikey>
 ```
 
 ```json
@@ -330,7 +330,7 @@ Fire `job.finished`, `job.error`, `job.cancelled` (and optionally `task.*`) to y
 ### `POST /v1/webhooks`
 
 ```json
-{ "url": "https://app.example.com/hooks/folio", "events": ["job.finished", "job.error"] }
+{ "url": "https://app.example.com/hooks/convert", "events": ["job.finished", "job.error"] }
 ```
 
 **Response includes `secret` once:**
@@ -342,7 +342,7 @@ Fire `job.finished`, `job.error`, `job.cancelled` (and optionally `task.*`) to y
 ### Delivery
 
 - `POST` with `Content-Type: application/json`, body = the same event objects as the WS stream, plus `jobId`.
-- **Signature:** `X-Folio-Signature: t=1699999999,v1=<HMAC-SHA256(secret, t + "." + body)>`. Verify with a constant-time compare; tolerate ±5 min clock skew (replay window).
+- **Signature:** `X-Convert-Signature: t=1699999999,v1=<HMAC-SHA256(secret, t + "." + body)>`. Verify with a constant-time compare; tolerate ±5 min clock skew (replay window).
 - **Retries:** exponential backoff `2^n` min (max 16 h), up to 8 attempts; a `409`/`410`/`422` response is treated as permanent failure and stops retries.
 - **Batching:** a job with many task events delivers one `job.finished` payload containing all task summaries. Delivery history at `GET /v1/webhooks/:id/deliveries`.
 
@@ -443,7 +443,7 @@ const { downloadUrl } = await fetch(`${BASE}/v1/jobs/${job.data.id}`, { headers:
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 export function verifyWebhook(req, secret) {
-  const sig = req.headers["x-folio-signature"];
+  const sig = req.headers["x-convert-signature"];
   const [t, v1] = sig.split(",").map(s => s.split("=")[1]);
   if (Math.abs(Date.now() / 1000 - Number(t)) > 300) return false;
   const expected = createHmac("sha256", secret).update(`${t}.${req.rawBody}`).digest("hex");
@@ -454,10 +454,10 @@ export function verifyWebhook(req, secret) {
 
 ### 11.3 Client-side conversion (no upload — private by default)
 
-`location: "client"` conversions (merge, split, rotate, watermark, compress, image→PDF, PDF→image/text/md) are executed by the browser library (`@folio/client`). The library posts only a history record when the user is signed in:
+`location: "client"` conversions (merge, split, rotate, watermark, compress, image→PDF, PDF→image/text/md) are executed by the browser library (`@convert/client`). The library posts only a history record when the user is signed in:
 
 ```js
-import { convert } from "@folio/client";
+import { convert } from "@convert/client";
 const result = await convert("pdf-compress", file, { compress: { level: "high" } });
 // result.blob — saved locally; never uploaded
 ```
@@ -466,10 +466,10 @@ const result = await convert("pdf-compress", file, { compress: { level: "high" }
 
 ## 12. SDKs & Tooling
 
-- **Official SDKs:** `@folio/sdk` (Node/TS), `@folio/sdk-python`, `@folio/client` (browser). Auto-generated from the OpenAPI spec with typed clients + retry/backoff built in.
-- **CLI:** `folio-cli convert report.docx --to pdf --key $FOLIO_API_KEY` (wraps the SDK; supports batch globs).
+- **Official SDKs:** `@convert/sdk` (Node/TS), `@convert/sdk-python`, `@convert/client` (browser). Auto-generated from the OpenAPI spec with typed clients + retry/backoff built in.
+- **CLI:** `convert-cli convert report.docx --to pdf --key $CONVERT_API_KEY` (wraps the SDK; supports batch globs).
 - **Zapier / n8n / Make:** certified integrations triggering jobs from email, cloud storage, and spreadsheets.
-- **Postman collection** and **OpenAPI JSON** published at `docs.folio.app`.
+- **Postman collection** and **OpenAPI JSON** published at `docs.convert.app`.
 
 ---
 

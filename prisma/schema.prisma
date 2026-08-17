@@ -1,4 +1,4 @@
-// Folio — Prisma schema (SQLite for local dev; Turso/libSQL in production).
+// Convert — Prisma schema (SQLite for local dev; Turso/libSQL in production).
 // Mirrors documentation/database-schema.md. MVP subset: files, jobs, tasks,
 // conversions, usage. User/ApiKey/Webhook tables are reserved for Phase 2.
 

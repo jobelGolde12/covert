@@ -1,6 +1,6 @@
-# Folio — Risk Assessment
+# Convert — Risk Assessment
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Technical risks, mitigation strategies, and contingency plans. Risks are scored **L (likelihood) × I (impact)** on a 1–5 scale; anything ≥ 8 is an active control with an owner and a review cadence. Re-reviewed each sprint and at every stage transition.
 
 ---
@@ -98,7 +98,7 @@
 
 ```mermaid
 quadrantChart
-    title Folio Risk Heatmap
+    title Convert Risk Heatmap
     x-axis "Low Likelihood" --> "High Likelihood"
     y-axis "Low Impact" --> "High Impact"
     quadrant-1 "Monitor"

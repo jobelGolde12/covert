@@ -1,9 +1,9 @@
-# Folio — Deployment Guide
+# Convert — Deployment Guide
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Production deployment: Vercel (web + API), Fly.io (workers + WebSocket gateway), Turso (database), Upstash (Redis), Cloudflare R2 (storage), Cloudflare CDN in front. Includes CI/CD, environment configuration, backup/disaster recovery, monitoring, and cost estimates.
 >
-> **Design compliance:** the public status page (`status.folio.app`) and deployment dashboards follow the `design.md` design system (calm white canvas, muted text, accent used only for incidents).
+> **Design compliance:** the public status page (`status.convert.app`) and deployment dashboards follow the `design.md` design system (calm white canvas, muted text, accent used only for incidents).
 
 ---
 
@@ -13,7 +13,7 @@
 flowchart LR
     U[User] -->|HTTPS| CF[Cloudflare CDN + WAF]
     CF -->|static + SSR| V[Vercel: Next.js app + API routes]
-    CF -->|presigned PUT/GET| R2[(R2 bucket folio-files)]
+    CF -->|presigned PUT/GET| R2[(R2 bucket convert-files)]
     V --> T[(Turso primary + replicas)]
     V --> R[(Upstash Redis)]
     V -->|enqueue| R
@@ -31,9 +31,9 @@ flowchart LR
 | Env | Purpose | Turso | R2 bucket | Notes |
 |---|---|---|---|---|
 | `development` | local (docker-compose) | local libSQL | MinIO | `NODE_ENV=development` |
-| `preview` | per-PR (Vercel preview) | shared staging | `folio-staging` | migrations NOT auto-run |
-| `staging` | pre-prod, CI deploys | staging primary | `folio-staging` | full test suite runs here |
-| `production` | live | prod primary (us-east) + EU/APAC replicas | `folio-files` | guarded deploys |
+| `preview` | per-PR (Vercel preview) | shared staging | `convert-staging` | migrations NOT auto-run |
+| `staging` | pre-prod, CI deploys | staging primary | `convert-staging` | full test suite runs here |
+| `production` | live | prod primary (us-east) + EU/APAC replicas | `convert-files` | guarded deploys |
 
 **Promotion:** `main` → staging → (smoke) → production via manual approval. Preview environments get seeded sample data + sandbox API keys.
 
@@ -45,10 +45,10 @@ flowchart LR
 2. **Environment variables:** all from `technical-specifications.md` §5.1 (production scope), with preview/dev variants. Secrets via Vercel dashboard or `vercel env add` in CI.
 3. **Region:** `iad1` (us-east-1) — collocated with Turso primary + nearest R2.
 4. **Concurrency/limits:** functions default; set `maxDuration` on worker-triggering routes only (they're fast — queue enqueue is ms).
-5. **Protection:** production domain `folio.app` + `api.folio.app` (separate project for the API origin, or path-rewritten); enforce HTTPS + HSTS.
+5. **Protection:** production domain `convert.app` + `api.convert.app` (separate project for the API origin, or path-rewritten); enforce HTTPS + HSTS.
 6. **Deployment protection** on previews (Vercel auth) so secrets/branches aren't exposed.
 
-> **api.folio.app:** we deploy the same Next.js app to a second Vercel project with `NEXT_PUBLIC_APP_URL=...` and only the `app/api` + `app/ws` routes enabled (route exclusion via `config`), so API traffic never pays for marketing SSR.
+> **api.convert.app:** we deploy the same Next.js app to a second Vercel project with `NEXT_PUBLIC_APP_URL=...` and only the `app/api` + `app/ws` routes enabled (route exclusion via `config`), so API traffic never pays for marketing SSR.
 
 ---
 
@@ -59,20 +59,20 @@ flowchart LR
 curl -sSfL https://get.turso.tech | bash
 
 # create databases (primary per region)
-turso db create folio-prod --location us-east
-turso db create folio-prod-eu --location eu-central
-turso db create folio-prod-ap --location ap-southeast
+turso db create convert-prod --location us-east
+turso db create convert-prod-eu --location eu-central
+turso db create convert-prod-ap --location ap-southeast
 
 # add read replicas to the primary
-turso db locations add eu-central --to folio-prod   # replica in Frankfurt
-turso db locations add ap-southeast --to folio-prod # replica in Singapore
+turso db locations add eu-central --to convert-prod   # replica in Frankfurt
+turso db locations add ap-southeast --to convert-prod # replica in Singapore
 
 # scoped auth tokens (least privilege)
-turso db tokens create folio-prod --role readwrite --expiration none -n "api-rw"
-turso db tokens create folio-prod --role read -n "workers-ro"
+turso db tokens create convert-prod --role readwrite --expiration none -n "api-rw"
+turso db tokens create convert-prod --role read -n "workers-ro"
 
 # backups (built-in): snapshot every 6h, retain 7d (configurable)
-turso db backups list folio-prod
+turso db backups list convert-prod
 ```
 
 **Migrations:** run by CI (`prisma migrate deploy`) **before** the app release step; never by developers against production. Verify with `prisma migrate diff` in staging. See `database-schema.md` §7 for expand/contract rules.
@@ -81,9 +81,9 @@ turso db backups list folio-prod
 
 ## 5. Redis (Upstash)
 
-- Create `folio-prod` (1 GB, `us-east-1`). Enable TLS.
+- Create `convert-prod` (1 GB, `us-east-1`). Enable TLS.
 - `REDIS_URL` = `rediss://...` for the API; workers use the same instance (Bull queues + pub/sub + rate limits + cache).
-- Queue key namespacing: `folio:bull:<engine>:*`, `folio:cache:*`, `folio:rl:*`, `folio:ws:*`.
+- Queue key namespacing: `convert:bull:<engine>:*`, `convert:cache:*`, `convert:rl:*`, `convert:ws:*`.
 - **Persistence:** Upstash default AOF — acceptable (queues are recoverable; jobs are re-enqueued on startup if stuck in `active`).
 
 ---
@@ -92,13 +92,13 @@ turso db backups list folio-prod
 
 ```bash
 # bucket + API token (bucket-scoped, least privilege)
-r2 bucket create folio-files
-r2 bucket cors set folio-files --cors '[
-  {"AllowedOrigins": ["https://folio.app", "https://api.folio.app"],
+r2 bucket create convert-files
+r2 bucket cors set convert-files --cors '[
+  {"AllowedOrigins": ["https://convert.app", "https://api.convert.app"],
    "AllowedMethods": ["GET","PUT","HEAD"], "AllowedHeaders": ["*"], "MaxAgeSeconds": 3600}
 ]'
-r2 bucket versioning enable folio-files          # DR: versioned objects, 30-day lifecycle
-r2 bucket lifecycle add folio-files --expire-days 30 --prefix files/
+r2 bucket versioning enable convert-files          # DR: versioned objects, 30-day lifecycle
+r2 bucket lifecycle add convert-files --expire-days 30 --prefix files/
 ```
 
 - Objects are **private**; access exclusively via presigned URLs (15-min PUT, 60-s GET).
@@ -120,11 +120,11 @@ r2 bucket lifecycle add folio-files --expire-days 30 --prefix files/
   internal_port = 8080
   protocol = "tcp"
 [mounts]
-  source = "folio_tmp"
+  source = "convert_tmp"
   destination = "/tmp"
 ```
 
-- **Autoscaling (KEDA-style via Fly Machines):** scale on Bull queue depth (`folio:bull:office:*:length`); min 2, max 32 per region; scale-down with 5-min cooldown.
+- **Autoscaling (KEDA-style via Fly Machines):** scale on Bull queue depth (`convert:bull:office:*:length`); min 2, max 32 per region; scale-down with 5-min cooldown.
 - **Rolling deploys:** Fly rolling releases; drain workers (stop claiming) → finish in-flight jobs (graceful 30 s) → replace. `fly deploy` with zero-downtime checks.
 - **Gateway:** 2 instances min per region behind Fly Anycast; stateless (Redis pub/sub); WS connections survive gateway restarts via reconnect.
 - **Health checks:** `/healthz` (process) + `/readyz` (Redis, R2 reachable); Fly auto-restarts unhealthy machines.
@@ -194,7 +194,7 @@ jobs:
 
 ### 10.2 DR scenarios
 
-1. **Turso primary failure (region outage):** `turso db fork folio-prod --from-backup` into a healthy region → point DNS at new primary → verify replicas → declare recovery. RTO < 30 min.
+1. **Turso primary failure (region outage):** `turso db fork convert-prod --from-backup` into a healthy region → point DNS at new primary → verify replicas → declare recovery. RTO < 30 min.
 2. **R2 region issue:** R2 is multi-zone by design; on bucket-level failure, restore from versioned copies (30-day window) or cross-bucket replication (added in Phase 3, `plan/implementation-roadmap.md`).
 3. **Full-region outage:** traffic fails over at Cloudflare (Argo/load-balancing) to a warm standby region with its own Turso replica + worker pool. Tested quarterly (game day).
 4. **Redis loss:** Bull re-enqueues `active` jobs on worker restart (idempotent via `Idempotency-Key`); rate-limit counters reset (acceptable); WS subscriptions re-establish.
@@ -216,8 +216,8 @@ Destructive/risky operations (table recreation for column drops, engine major up
 ## 12. Monitoring & Alerting (Deployment)
 
 - **Synthetic checks** every minute from 3 regions: landing 200, `POST /v1/jobs` + convert flow, WS connect, upload presign. Down → PagerDuty page (escalation: 5 min / 15 min / 30 min).
-- **Alert routing:** `#folio-oncall` (Slack) + PagerDuty; severity matrix in `ops/runbooks/`.
-- **Status page:** `status.folio.app` (external) — incidents auto-posted from PagerDuty.
+- **Alert routing:** `#convert-oncall` (Slack) + PagerDuty; severity matrix in `ops/runbooks/`.
+- **Status page:** `status.convert.app` (external) — incidents auto-posted from PagerDuty.
 - **On-call:** weekly rotation; runbook links in every alert.
 
 ---
@@ -244,7 +244,7 @@ At 10M conversions/mo: workers scale to ~40 cores (≈ $2.5–3.5k), storage/R2 
 
 ## 14. Go-Live Checklist
 
-- [ ] DNS: `folio.app` + `api.folio.app` + `status.folio.app` → Cloudflare; TLS everywhere
+- [ ] DNS: `convert.app` + `api.convert.app` + `status.convert.app` → Cloudflare; TLS everywhere
 - [ ] Vercel prod + staging + preview projects configured; env vars scoped
 - [ ] Turso primary + replicas live; tokens least-privilege; backups verified by restore drill
 - [ ] Upstash Redis provisioned; queue namespaces confirmed

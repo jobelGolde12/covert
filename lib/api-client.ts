@@ -1,6 +1,6 @@
 "use client";
 
-/** Small typed client for the Folio API (documentation/api-documentation.md). */
+/** Small typed client for the Convert API (documentation/api-documentation.md). */
 
 export interface ApiError extends Error {
   code: string;

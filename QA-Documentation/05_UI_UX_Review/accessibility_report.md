@@ -8,7 +8,7 @@ Reviewed through a live browser accessibility tree (agent-browser/Chromium) plus
 |---|---|
 | Skip link (2.4.1) | `Skip to content` is the first focusable element, `href="#main"`, appears on focus. `app/layout.tsx:28-33` |
 | Language (3.1.1) | `<html lang="en">`. `app/layout.tsx:26` |
-| Page title (2.4.2) | `title` template `%s · Folio`, default set in `app/layout.tsx:14-18` |
+| Page title (2.4.2) | `title` template `%s · Convert`, default set in `app/layout.tsx:14-18` |
 | Heading structure (1.3.1) | Single `h1` per page; content sections use `h2`/`h3`/`h4` consistently |
 | Landmarks (1.3.1) | `main`, `nav` (`Primary`), `navigation` for footer columns, `region` for content sections |
 | Navigation labeling (2.4.6) | Header nav labeled "Primary"; footer link groups have headings (CONVERT / COMPANY / SUPPORT) |

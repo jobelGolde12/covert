@@ -1,4 +1,4 @@
-# Folio
+# Convert
 
 **Document conversion with style and substance.** A browser-first document converter supporting 25 conversions between Word, PDF, PowerPoint, Excel, images, HTML, Markdown and text — plus PDF utilities (merge, split, rotate, watermark, compress) that run **entirely on your device**.
 

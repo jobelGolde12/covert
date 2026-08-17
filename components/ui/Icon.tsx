@@ -12,11 +12,19 @@ export type IconName =
   | "spinner"
   | "check"
   | "file"
+  | "file-text"
+  | "file-pdf"
+  | "file-spreadsheet"
   | "plus"
   | "chevron-down"
   | "menu"
   | "device"
   | "shield"
+  | "shield-check"
+  | "wrench"
+  | "image"
+  | "align-left"
+  | "globe"
   | "alert"
   | "refresh"
   | "lock"
@@ -56,6 +64,31 @@ const PATHS: Record<IconName, ReactNode> = {
       <path d="M14 2v6h6" />
     </>
   ),
+  "file-text": (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 13h6" />
+      <path d="M9 17h6" />
+    </>
+  ),
+  "file-pdf": (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 12h6" />
+      <path d="M12 12v6" />
+    </>
+  ),
+  "file-spreadsheet": (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 13h6" />
+      <path d="M9 17h6" />
+      <path d="M12 13v4" />
+    </>
+  ),
   plus: (
     <>
       <path d="M12 5v14" />
@@ -77,6 +110,36 @@ const PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   shield: <path d="M12 3l7 3v5.5c0 4.2-2.8 7.6-7 9.5-4.2-1.9-7-5.3-7-9.5V6z" />,
+  "shield-check": (
+    <>
+      <path d="M12 3l7 3v5.5c0 4.2-2.8 7.6-7 9.5-4.2-1.9-7-5.3-7-9.5V6z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
+  wrench: (
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+  ),
+  image: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="1" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L6 20" />
+    </>
+  ),
+  "align-left": (
+    <>
+      <path d="M3 6h14" />
+      <path d="M3 12h18" />
+      <path d="M3 18h10" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a15.3 15.3 0 0 1 4 9 15.3 15.3 0 0 1-4 9 15.3 15.3 0 0 1-4-9 15.3 15.3 0 0 1 4-9z" />
+    </>
+  ),
   alert: (
     <>
       <path d="M12 3 2 20h20z" />

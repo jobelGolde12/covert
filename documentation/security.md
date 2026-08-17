@@ -1,6 +1,6 @@
-# Folio — Security & Compliance
+# Convert — Security & Compliance
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Security model covering file handling, data privacy, encryption, authentication, and compliance (GDPR, CCPA). The security posture is informed by the practices of leading conversion platforms (iLovePDF's end-to-end encryption + short retention, CloudConvert's scoped keys + sandbox) — adapted and extended for our architecture.
 >
 > **Design compliance:** the privacy center, consent banner, and settings UI implement `design.md` (restrained palette, clear hierarchy, accessible focus states per `design.md` §27).
@@ -80,7 +80,7 @@ Every uploaded file is treated as **untrusted attacker input** (conversion engin
 
 ### API keys
 
-- Format `folio_live_<32B base62>`; **SHA-256 hash stored** — DB leak exposes no usable keys.
+- Format `convert_live_<32B base62>`; **SHA-256 hash stored** — DB leak exposes no usable keys.
 - Scoped (`jobs:read`, …), revocable instantly, expirable; `lastUsedAt` surfaced in dashboard.
 - Rotation guidance: create new key → migrate → revoke old (dashboard shows grace period).
 - Never accept keys in query strings; header only.
@@ -94,7 +94,7 @@ Content-Security-Policy:
   default-src 'self';
   script-src 'self' 'unsafe-inline' (dev) https://challenges.cloudflare.com;
   worker-src 'self' blob:;
-  connect-src 'self' wss://api.folio.app https://*.r2.cloudflarestorage.com https://api.stripe.com;
+  connect-src 'self' wss://api.convert.app https://*.r2.cloudflarestorage.com https://api.stripe.com;
   img-src 'self' data: blob: https://*.r2.cloudflarestorage.com;
   style-src 'self' 'unsafe-inline';
   frame-ancestors 'none';
@@ -172,7 +172,7 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 ## 10. Webhook Security
 
-- `X-Folio-Signature: t=<ts>,v1=<hmac-sha256(secret, t.body)>` — verify with constant-time compare (`api-documentation.md` §11.2).
+- `X-Convert-Signature: t=<ts>,v1=<hmac-sha256(secret, t.body)>` — verify with constant-time compare (`api-documentation.md` §11.2).
 - Replay window ±5 min; delivery retries with backoff; permanent-failure semantics documented.
 - Endpoint URL must be `https://` (enforced); secrets hashed at rest, shown once.
 
@@ -180,11 +180,11 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 ## 11. Logging, Monitoring & Incident Response
 
-- Structured logs with **PII redaction** at the edge (regex + field allowlist; filenames replaced with `[redacted]` unless allowlisted by format). No passwords, no document contents, no full API keys (only `folio_live_ab12…` prefix).
+- Structured logs with **PII redaction** at the edge (regex + field allowlist; filenames replaced with `[redacted]` unless allowlisted by format). No passwords, no document contents, no full API keys (only `convert_live_ab12…` prefix).
 - **Sentry** for application errors (source maps), **Grafana/OTel** for metrics/traces, **Cloudflare analytics** for edge.
 - **Alerts:** auth-failure spikes, rate-limit saturation, anomalous bytes-per-user, queue starvation, webhook failure rate.
 - **Runbooks:** (1) account-takeover report, (2) data breach, (3) malicious-file outbreak (engine CVE), (4) DDoS, (5) dependency CVE. Each has owner, steps, and postmortem template.
-- **Responsible disclosure:** `security@folio.app`, PGP key published; `security.txt` at `/.well-known/security.txt`; Hall of Fame. Bug-bounty program in Phase 3.
+- **Responsible disclosure:** `security@convert.app`, PGP key published; `security.txt` at `/.well-known/security.txt`; Hall of Fame. Bug-bounty program in Phase 3.
 
 ---
 

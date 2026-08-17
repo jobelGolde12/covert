@@ -1,6 +1,6 @@
-# Folio — Database Schema (Turso + Prisma)
+# Convert — Database Schema (Turso + Prisma)
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > This document defines the Turso (SQLite via libSQL) database design: tables, relationships, indexes, and the migration strategy. Turso is chosen for edge-read latency, zero-ops, and cost predictability at the documented scale (see `plan/scalability-plan.md`). We use **Prisma ORM with the `@prisma/adapter-libsql` driver adapter**.
 >
 > **Design compliance:** the admin console and internal dashboards that surface this data implement the `design.md` design system (restrained palette, Inter, sharp architectural shapes).
@@ -133,7 +133,7 @@ model ApiKey {
   id          String    @id @default(uuid())
   userId      String
   name        String
-  keyPrefix   String    // first 8 chars, for display: "folio_live_ab12cd34"
+  keyPrefix   String    // first 8 chars, for display: "convert_live_ab12cd34"
   keyHash     String    @unique // SHA-256 of the full key
   scopes      String    // JSON array: ["jobs:read","jobs:write",...]
   lastUsedAt  DateTime?
@@ -155,7 +155,7 @@ model File {
   id              String    @id @default(uuid())
   userId          String?   // null = anonymous guest
   storageKey      String    @unique // "files/<uuid>/<uuid>.docx" — path-safe, no user input
-  bucket          String    @default("folio-files")
+  bucket          String    @default("convert-files")
   filename        String    // original name (display only)
   mimeType        String
   sizeBytes       Int

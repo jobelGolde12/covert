@@ -1,13 +1,13 @@
-# Folio — User Guide
+# Convert — User Guide
 
-> **Product:** Folio — *"Document conversion with style and substance."*
+> **Product:** Convert — *"Document conversion with style and substance."*
 > Everything end users need: feature explanations, step-by-step guides, troubleshooting, and FAQ. The interface implements the design system in `design.md` — a calm, editorial, white-first layout with a restrained red accent (`#C8102E`) and dark CTAs.
 
 ---
 
-## 1. What is Folio?
+## 1. What is Convert?
 
-Folio converts documents between **Word, PDF, PowerPoint, Excel, images, HTML, Markdown, and text**, plus everyday PDF utilities (merge, split, rotate, watermark, compress). It runs in your browser — no software to install, nothing to download except your converted file.
+Convert converts documents between **Word, PDF, PowerPoint, Excel, images, HTML, Markdown, and text**, plus everyday PDF utilities (merge, split, rotate, watermark, compress). It runs in your browser — no software to install, nothing to download except your converted file.
 
 **Two kinds of conversions:**
 
@@ -72,7 +72,7 @@ Convert many files with the same settings:
 
 1. Drop up to **50 files** (or choose a folder).
 2. Pick the target format once.
-3. Folio queues them (parallel, up to your plan's concurrency) with per-file progress.
+3. Convert queues them (parallel, up to your plan's concurrency) with per-file progress.
 4. Download each result, or **Download all as ZIP** (ZIP is created client-side for browser conversions).
 
 ### 3.3 Cloud storage (Google Drive, Dropbox)
@@ -95,16 +95,16 @@ Convert many files with the same settings:
 
 ### 3.6 Password protection & encrypted PDFs
 
-- **Open encrypted PDFs:** when a PDF requires a password, Folio prompts you — the password is used in memory only and never stored or logged.
+- **Open encrypted PDFs:** when a PDF requires a password, Convert prompts you — the password is used in memory only and never stored or logged.
 - **Protect output:** when converting to PDF, set **"Protect with password"** to encrypt the output (AES-256). The password is your own; if you lose it, the file cannot be recovered (and neither can we help — it's encrypted).
 
 ### 3.7 API for developers
 
-Developers can automate all of this: `POST /v1/jobs`, webhooks, SDKs, 28 formats. See `api-documentation.md`; developer docs live at `docs.folio.app`.
+Developers can automate all of this: `POST /v1/jobs`, webhooks, SDKs, 28 formats. See `api-documentation.md`; developer docs live at `docs.convert.app`.
 
 ### 3.8 Offline use (PWA)
 
-Install Folio from your browser menu (**Add to Home Screen**). Browser-side conversions (merge, split, rotate, watermark, compress, image→PDF, PDF→text) work **fully offline**; queued jobs complete when you're back online.
+Install Convert from your browser menu (**Add to Home Screen**). Browser-side conversions (merge, split, rotate, watermark, compress, image→PDF, PDF→text) work **fully offline**; queued jobs complete when you're back online.
 
 ---
 
@@ -132,7 +132,7 @@ Daily limits reset at midnight UTC. Unused daily allowance does not roll over.
 |---|---|
 | "File type not supported" | The format isn't in our catalog (e.g., `.pages`, `.odt` → check All conversions; we support 30+ input types). Re-export to `.docx`/`.pdf` first. |
 | "Failed to open the file" | The file is corrupt or a renamed file with the wrong extension. Open it in its original app, save as the correct type, retry. |
-| "PDF requires a password" | Enter the password when prompted. Folio can't bypass PDF encryption — if you don't know it, use the document owner's password. |
+| "PDF requires a password" | Enter the password when prompted. Convert can't bypass PDF encryption — if you don't know it, use the document owner's password. |
 | Watermark looks pixelated | Use text watermarks (rendered as vector); for image watermarks use a PNG/SVG with transparency, 300+ px. |
 | Layout changed after PDF→Word | Expected for complex layouts. Enable OCR for scanned text; for tables, convert PDF→Excel and fix in Excel. |
 | Conversion stuck at "queued" | Rare — usually engine fleet saturation. Wait up to 2 min; if still queued, cancel and retry. |
@@ -142,7 +142,7 @@ Daily limits reset at midnight UTC. Unused daily allowance does not roll over.
 | OCR quality is poor | Re-scan at 300 DPI, ensure text isn't skewed; try "Make PDF searchable" with the correct language selected. |
 | "Your device is out of memory" (browser conversion) | A very large PDF (300+ MB) hit the browser's memory ceiling. Use Chrome/Edge desktop, close other tabs, or retry as a server conversion (Pro plan allows 500 MB). |
 
-**Still stuck?** `support@folio.app` — include the job/error code shown in the red banner (e.g., `CONVERSION_FAILED · 01HZY-...`). We don't see your file contents, so no need to redact.
+**Still stuck?** `support@convert.app` — include the job/error code shown in the red banner (e.g., `CONVERSION_FAILED · 01HZY-...`). We don't see your file contents, so no need to redact.
 
 ---
 
@@ -152,7 +152,7 @@ Daily limits reset at midnight UTC. Unused daily allowance does not roll over.
 
 **Are my files private?** Browser-side conversions never leave your device. Server-side files are encrypted in transit and at rest, processed in isolated containers, and auto-deleted after 1 h / 24 h / 7 days. We never access file contents — see `security.md`.
 
-**How is this different from other converters?** Most converters upload every file to their servers. Folio keeps merge/split/rotate/watermark/compress and image→PDF entirely on-device (zero upload, works offline), and server conversions get industry-leading retention cleanup.
+**How is this different from other converters?** Most converters upload every file to their servers. Convert keeps merge/split/rotate/watermark/compress and image→PDF entirely on-device (zero upload, works offline), and server conversions get industry-leading retention cleanup.
 
 **Can I convert a scanned PDF to editable Word?** Yes — enable OCR (paid plans) or use the searchable-PDF tool.
 
@@ -160,7 +160,7 @@ Daily limits reset at midnight UTC. Unused daily allowance does not roll over.
 
 **Do you store my Drive/Dropbox files?** No — we only fetch the file you select, process it, and delete per retention. OAuth access is revocable at any time.
 
-**Is there a desktop app?** Folio is a PWA — install it from the browser for an app-like experience with offline support.
+**Is there a desktop app?** Convert is a PWA — install it from the browser for an app-like experience with offline support.
 
 **Do you support mobile?** Yes — fully responsive (design.md §15: mobile reflows the hero and converter into a single-column flow), with the same limits as desktop.
 
@@ -191,4 +191,4 @@ Daily limits reset at midnight UTC. Unused daily allowance does not roll over.
 - Privacy policy, terms, and cookie policy linked in the footer and during signup.
 - Account deletion: **Settings → Delete account** → instant full erasure (GDPR/CCPA). Data export available before deletion.
 - Data residency: EU customers can pin processing to EU regions in Settings (Business plan+).
-- Security contact: `security@folio.app`.
+- Security contact: `security@convert.app`.

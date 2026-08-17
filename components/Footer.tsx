@@ -14,18 +14,25 @@ const GROUPS = [
     title: "Company",
     links: [
       { label: "Story", href: "/#story" },
-      { label: "Privacy", href: "/#privacy" },
       { label: "Docs", href: "/#formats" },
-      { label: "Contact", href: "mailto:support@folio.app" },
+      { label: "Contact", href: "mailto:support@convert.app" },
     ],
   },
   {
     title: "Support",
     links: [
       { label: "FAQ", href: "/#faq" },
-      { label: "File retention", href: "/#privacy" },
-      { label: "Status", href: "https://status.folio.app" },
-      { label: "Security", href: "mailto:security@folio.app" },
+      { label: "File retention", href: "/privacy" },
+      { label: "Status", href: "https://status.convert.app" },
+      { label: "Security", href: "mailto:security@convert.app" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Accessibility", href: "/accessibility" },
     ],
   },
 ];
@@ -33,11 +40,11 @@ const GROUPS = [
 export function Footer() {
   return (
     <footer className="bg-dark text-white/70">
-      <div className="mx-auto max-w-container px-5 md:px-10 lg:px-16 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
-        <div className="col-span-2 md:col-span-1">
+      <div className="mx-auto max-w-container px-5 md:px-10 lg:px-16 py-16 grid grid-cols-2 lg:grid-cols-5 gap-10">
+        <div className="col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-4">
             <span className="w-[18px] h-[18px] bg-accent inline-block" aria-hidden="true" />
-            <span className="text-white text-[17px] font-semibold tracking-[-0.02em]">Folio</span>
+            <span className="text-white text-[17px] font-semibold tracking-[-0.02em]">Convert</span>
           </div>
           <p className="text-body-sm text-white/50 max-w-[220px]">
             Document conversion with style and substance. Your files stay yours.
@@ -60,11 +67,11 @@ export function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-container px-5 md:px-10 lg:px-16 py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-body-sm text-white/40">
-          <p>© 2026 Folio. All rights reserved.</p>
+          <p>© 2026 Convert. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/#privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/#privacy" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/#faq" className="hover:text-white transition-colors">Accessibility</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
           </div>
         </div>
       </div>

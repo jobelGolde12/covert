@@ -1,6 +1,6 @@
-# Folio — Technical Specifications
+# Convert — Technical Specifications
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > This document is the authoritative reference for the technology stack: versions, dependencies, configuration, and environment variables. It pairs with `architecture.md` (system design), `database-schema.md` (schema), and `deployment.md` (environments).
 
 ---
@@ -46,7 +46,7 @@
 ## 2. Repository Structure
 
 ```text
-folio/
+convert/
 ├── app/
 │   ├── (marketing)/          # Landing page — design.md implementation
 │   │   ├── page.tsx          # Hero, categories, brand story, showcase, CTA
@@ -179,7 +179,7 @@ CMD ["node", "dist/workers/office/index.js"]
 ```yaml
 services:
   redis:        { image: redis:7-alpine, ports: ["6379:6379"] }
-  turso:        { image: ghcr.io/tursodatabase/libsql-server:latest, ports: ["8080:8080"], command: ["--db-path", "/data/folio.db"] }
+  turso:        { image: ghcr.io/tursodatabase/libsql-server:latest, ports: ["8080:8080"], command: ["--db-path", "/data/convert.db"] }
   worker-office: { build: { context: . }, command: ["node", "dist/workers/office/index.js"] }
   worker-html:  { build: { context: . }, command: ["node", "dist/workers/html/index.js"] }
   minio:        { image: minio/minio, ports: ["9000:9000"], command: ["server", "/data"] }  # R2 stand-in
@@ -194,8 +194,8 @@ services:
 
 | Variable | Required | Description |
 |---|---|---|
-| `NEXT_PUBLIC_APP_URL` | ✅ | Canonical public origin (`https://folio.app`) |
-| `NEXT_PUBLIC_WS_URL` | ✅ | WebSocket origin (`wss://api.folio.app/v1/ws`) |
+| `NEXT_PUBLIC_APP_URL` | ✅ | Canonical public origin (`https://convert.app`) |
+| `NEXT_PUBLIC_WS_URL` | ✅ | WebSocket origin (`wss://api.convert.app/v1/ws`) |
 | `NEXTAUTH_SECRET` | ✅ | ≥32 random bytes; signs sessions/CSRF |
 | `NEXTAUTH_URL` | ✅ | Auth origin |
 | `DATABASE_URL` | ✅ | Turso primary URL (`libsql://...turso.io`) |
@@ -203,7 +203,7 @@ services:
 | `REDIS_URL` | ✅ | Upstash REST/`ioredis` URL |
 | `R2_ACCOUNT_ID` | ✅ | Cloudflare account id |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | ✅ | S3 API credentials (least-privilege, bucket-scoped) |
-| `R2_BUCKET` | ✅ | `folio-files` |
+| `R2_BUCKET` | ✅ | `convert-files` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | dev-only | Google OAuth (web sign-in) |
 | `GITHUB_ID` / `GITHUB_SECRET` | dev-only | GitHub OAuth |
 | `GOOGLE_DRIVE_CLIENT_ID` / `GOOGLE_DRIVE_CLIENT_SECRET` | feature-gated | Drive import |

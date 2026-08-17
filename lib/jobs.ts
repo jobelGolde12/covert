@@ -133,7 +133,7 @@ export async function processOfficeJob(jobId: string): Promise<void> {
     return;
   }
 
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `folio-${jobId}-`));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `convert-${jobId}-`));
   let outputPath: string | undefined;
   try {
     await setTaskProgress(task.id, 20);
@@ -169,7 +169,7 @@ export async function processOfficeJob(jobId: string): Promise<void> {
       data: {
         id: outId,
         storageKey,
-        bucket: "folio-files",
+        bucket: "convert-files",
         filename: `${inputFile.filename.replace(/\.[^.]+$/, "")}.${extensionFor(target)}`,
         mimeType: mimeFor(target),
         sizeBytes: outBuf.length,

@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-Independent quality-assurance pass over the **Folio** web application (Next.js 14 document converter) in the project root. This QA run is **test-only**: findings are documented, none of the underlying defects were fixed as part of this effort.
+Independent quality-assurance pass over the **Convert** web application (Next.js 14 document converter) in the project root. This QA run is **test-only**: findings are documented, none of the underlying defects were fixed as part of this effort.
 
 ## 2. Scope of the run
 

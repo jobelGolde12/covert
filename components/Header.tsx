@@ -10,15 +10,15 @@ import { Icon } from "@/components/ui/Icon";
 const NAV = [
   { label: "Convert", href: "/convert" },
   { label: "Formats", href: "/#formats" },
-  { label: "Privacy", href: "/#privacy" },
+  { label: "Privacy", href: "/privacy" },
   { label: "Story", href: "/#story" },
 ];
 
 export function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2" aria-label="Folio home">
+    <Link href="/" className="flex items-center gap-2" aria-label="Convert home">
       <span className="w-[18px] h-[18px] bg-accent inline-block" aria-hidden="true" />
-      <span className="text-[17px] font-semibold tracking-[-0.02em] text-foreground">Folio</span>
+      <span className="text-[17px] font-semibold tracking-[-0.02em] text-foreground">Convert</span>
     </Link>
   );
 }

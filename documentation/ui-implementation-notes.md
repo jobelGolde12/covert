@@ -1,4 +1,4 @@
-# Folio — UI Enhancement: Implementation Notes
+# Convert — UI Enhancement: Implementation Notes
 
 Companion to [`ui-design-system.md`](ui-design-system.md). Records what changed, the decisions behind it, the trade-offs, and how to extend it. Covers the **UI enhancement task** from `TODO.md`.
 

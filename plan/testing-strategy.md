@@ -1,6 +1,6 @@
-# Folio — Testing Strategy
+# Convert — Testing Strategy
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Comprehensive plan: unit, integration, E2E, performance, and security testing — mapped to the CI pipeline, with a golden-file conversion corpus as the backbone (conversion quality is the product).
 
 ---

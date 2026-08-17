@@ -1,6 +1,6 @@
-# Folio — Performance Engineering
+# Convert — Performance Engineering
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Performance strategy across the edge (CDN), web app, API, queues, engines, and database — plus benchmarks, budgets, and the load model. Core Web Vitals targets follow `design.md` §39: **LCP < 2.5 s, CLS < 0.1, INP < 200 ms**, and additionally **first conversion ready < 5 s** for client-side operations.
 
 ---

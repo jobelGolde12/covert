@@ -25,13 +25,13 @@ pnpm db:migrate              # prisma migrate dev (or db:push for schema-only)
 
 ```bash
 # dev server
-nohup pnpm dev > /tmp/folio-dev.log 2>&1 & disown
+nohup pnpm dev > /tmp/convert-dev.log 2>&1 & disown
 
 # queue worker (requires Redis + soffice)
-nohup pnpm worker:office > /tmp/folio-office.log 2>&1 & disown
+nohup pnpm worker:office > /tmp/convert-office.log 2>&1 & disown
 
 # retention sweeper
-nohup pnpm worker:sweeper > /tmp/folio-sweeper.log 2>&1 & disown
+nohup pnpm worker:sweeper > /tmp/convert-sweeper.log 2>&1 & disown
 ```
 
 Readiness checks:

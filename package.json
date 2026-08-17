@@ -1,8 +1,8 @@
 {
-  "name": "folio",
+  "name": "convert",
   "version": "0.1.0",
   "private": true,
-  "description": "Folio — document conversion with style and substance. Browser-first converter (private by default) with a LibreOffice-backed server pipeline.",
+  "description": "Convert — document conversion with style and substance. Browser-first converter (private by default) with a LibreOffice-backed server pipeline.",
   "scripts": {
     "copy:pdfjs": "node scripts/copy-pdfjs-worker.mjs",
     "postinstall": "node scripts/copy-pdfjs-worker.mjs",

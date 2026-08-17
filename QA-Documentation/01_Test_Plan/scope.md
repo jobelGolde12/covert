@@ -3,7 +3,7 @@
 ## In scope
 
 ### Application under test
-- **Product**: Folio — document conversion service (browser-first converter with a LibreOffice-backed server pipeline).
+- **Product**: Convert — document conversion service (browser-first converter with a LibreOffice-backed server pipeline).
 - **Stack (production profile)**: Next.js 14.2.28 (App Router), React 18.3.1, TypeScript (strict), Tailwind CSS 3.4.13, Prisma 5.22 / SQLite (prod: Turso), Redis 7.0.15 + BullMQ 5.34, ioredis, zod 3.23, @tanstack/react-query 5.59, zustand 4.5, pdf-lib 1.17, pdfjs-dist 4.7.76, react-dropzone 14.3.5.
 - **Environment tested**: local dev server (`http://localhost:3000`, `next dev`), real LibreOffice 24.2.7.2, real Redis on `127.0.0.1:6379`, SQLite `prisma/dev.db`, office worker concurrency 1, sweeper interval 15 min.
 

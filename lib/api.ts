@@ -22,7 +22,7 @@ export function apiError(
   return NextResponse.json({ error: { code, message, ...(details ? { details } : {}) } }, { status, ...init });
 }
 
-const GUEST_COOKIE = "folio_guest";
+const GUEST_COOKIE = "convert_guest";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 90; // 90 days
 const TRUSTED_PROXIES = ["127.0.0.1", "::1"]; // Only trust X-Forwarded-For from these proxies
 

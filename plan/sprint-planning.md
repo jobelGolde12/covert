@@ -1,6 +1,6 @@
-# Folio — Sprint Planning
+# Convert — Sprint Planning
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Agile breakdown for the MVP (Phase 1, weeks 1–8): sprint cadence **2 weeks**, 4 engineers, user stories with acceptance criteria and dependencies. Sprint 0 = foundation; Sprints 1–2 detailed below; Sprints 3–4 summarized with the same rigor (full backlog lives in Linear, linked from each sprint).
 
 **Team:** 2 full-stack (A, B), 1 backend/workers (C), 1 frontend/design-system (D) + PM/design 0.5 FTE.

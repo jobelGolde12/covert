@@ -1,6 +1,6 @@
-# Folio — Scalability Plan
+# Convert — Scalability Plan
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Growth strategy from launch (1M conversions/mo) to 100M conversions/mo: horizontal scaling, database sharding, load testing, capacity planning, and the cost model. This plan assumes the architecture in `documentation/architecture.md` and the load baseline in `documentation/performance.md` §9.
 >
 > **Design compliance:** internal scaling/ops dashboards follow the `design.md` design system (tokens, typography, restrained accent for alert states).
@@ -30,7 +30,7 @@
 ```yaml
 # KEDA-style policy (Fly Machines autoscaler)
 scaling:
-  metric: bull_queue_depth        # folio:bull:office:*:length
+  metric: bull_queue_depth        # convert:bull:office:*:length
   min: 2
   max: 32
   cooldown: 300s
@@ -160,7 +160,7 @@ flowchart LR
     R_EU -.replication.-> R_US
 ```
 
-- **Geo-routing at the CDN/API:** EU users land on EU endpoints (`eu-central.api.folio.app`); writes replicate to the US primary asynchronously — eventual consistency is acceptable because jobs are user-scoped and self-consistent.
+- **Geo-routing at the CDN/API:** EU users land on EU endpoints (`eu-central.api.convert.app`); writes replicate to the US primary asynchronously — eventual consistency is acceptable because jobs are user-scoped and self-consistent.
 - **Data residency:** EU customers pinned to EU region end-to-end (Turso replica + R2 EU bucket + EU workers) — the GDPR story from `documentation/security.md` §8.1.
 - **Failover:** region health checks at Cloudflare; on EU failure, traffic shifts to US (RTO < 5 min, documented in `deployment.md` §10.2).
 

@@ -1,20 +1,20 @@
-# Folio — System Architecture
+# Convert — System Architecture
 
-> **Product:** Folio — *"Document conversion with style and substance."*
+> **Product:** Convert — *"Document conversion with style and substance."*
 > A production-grade, browser-first document conversion platform supporting 20+ conversions between Word, PDF, PowerPoint, Excel, images, HTML, Markdown, and text — plus PDF utilities (merge, split, rotate, watermark, compress), batch conversion, OCR, cloud-storage imports, and a developer API.
 >
-> **Design reference:** This document is part of the Folio documentation set. All UI-facing decisions reference [`design.md`](../design.md) (premium, editorial, restrained black/white/red palette, Inter typography, sharp architectural shapes, generous whitespace).
+> **Design reference:** This document is part of the Convert documentation set. All UI-facing decisions reference [`design.md`](../design.md) (premium, editorial, restrained black/white/red palette, Inter typography, sharp architectural shapes, generous whitespace).
 
 ---
 
 ## 1. Architectural Overview
 
-Folio uses a **hybrid processing architecture**: simple PDF operations run **client-side in Web Workers** (private by default — files never leave the device), while office-format conversions (Word/PPT/Excel ↔ PDF) run **server-side on a LibreOffice worker fleet**. A **jobs/tasks model** (inspired by CloudConvert) decouples the API from processing, giving us durability, retryability, and observability.
+Convert uses a **hybrid processing architecture**: simple PDF operations run **client-side in Web Workers** (private by default — files never leave the device), while office-format conversions (Word/PPT/Excel ↔ PDF) run **server-side on a LibreOffice worker fleet**. A **jobs/tasks model** (inspired by CloudConvert) decouples the API from processing, giving us durability, retryability, and observability.
 
 ```mermaid
 flowchart TB
     subgraph Client["Browser (Next.js 14 App Router)"]
-        UI[Folio Web App<br/>Tailwind · Zustand · React Query]
+        UI[Convert Web App<br/>Tailwind · Zustand · React Query]
         WW[Web Workers<br/>pdf-lib · PDF.js · Sharp(wasm) · Tesseract.js]
         PWA[PWA Shell<br/>offline convert queue]
     end
@@ -239,7 +239,7 @@ flowchart LR
 | Browser ↔ API | HTTPS REST (`/api/v1/*`) | JSON; Bearer JWT or API key |
 | Browser ↔ R2 | HTTPS presigned PUT/GET | Direct, no proxy |
 | Browser ↔ WS gateway | WSS | `?token=` JWT, channel = jobId |
-| API ↔ Redis | RESP | Bull queues (`folio:jobs:*`), rate limits, cache, pub/sub |
+| API ↔ Redis | RESP | Bull queues (`convert:jobs:*`), rate limits, cache, pub/sub |
 | API ↔ Turso | libSQL wire (TLS) | Prisma ORM, WAL mode |
 | Worker ↔ Redis | RESP | Claim jobs, publish progress/result |
 | Worker ↔ R2 | S3 API (signed) | Input fetch, output put |
@@ -251,7 +251,7 @@ flowchart LR
 
 ## 6. Real-Time Progress (WebSocket)
 
-- Gateway URL: `wss://api.folio.app/v1/ws?token=<jwt>`.
+- Gateway URL: `wss://api.convert.app/v1/ws?token=<jwt>`.
 - Client subscribes with `{ "type": "subscribe", "jobId": "..." }`.
 - Events (all JSON, `{ type, jobId, taskId, ... }`):
 
@@ -272,7 +272,7 @@ flowchart LR
 ## 7. Authentication & Authorization Flow
 
 1. **Users:** NextAuth.js with Google/GitHub OAuth + email magic links. Sessions are JWT (stateless, signed with `NEXTAUTH_SECRET`) stored in an httpOnly cookie.
-2. **API keys:** scoped keys (`jobs:read`, `jobs:write`, `files:read`, `webhooks:write`, …) hashed with SHA-256 at rest; sent as `Authorization: Bearer folio_live_...`.
+2. **API keys:** scoped keys (`jobs:read`, `jobs:write`, `files:read`, `webhooks:write`, …) hashed with SHA-256 at rest; sent as `Authorization: Bearer convert_live_...`.
 3. **Middleware:** every `/api/v1/*` route runs a shared guard: resolve identity (JWT cookie → API key → anonymous), enforce rate limits, then authorize by scope.
 4. **Anonymous users** get a guest session (short-lived JWT, `sub:anon:<fingerprint>`); their history is stored with `user_id = NULL` and purged with the file retention window.
 

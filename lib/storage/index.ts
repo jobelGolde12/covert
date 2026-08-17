@@ -67,7 +67,7 @@ class LocalStorageAdapter implements StorageAdapter {
     return {
       uploadUrl: `${base}/api/v1/files/upload/put?key=${encodeURIComponent(key)}&exp=${exp}&token=${token}`,
       method: "PUT",
-      headers: { "content-type": opts.mimeType, "x-folio-size": String(opts.sizeBytes) },
+      headers: { "content-type": opts.mimeType, "x-convert-size": String(opts.sizeBytes) },
       expiresAt: new Date(exp * 1000).toISOString(),
     };
   }

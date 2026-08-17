@@ -1,4 +1,4 @@
-# Folio — UI Design System
+# Convert — UI Design System
 
 > **Design reference:** This document codifies the implementation of the visual language in [`design.md`](../design.md) — premium editorial, restrained black/white/red palette, Inter typography, sharp architectural shapes, generous whitespace. Everything here maps back to a numbered `design.md` section where relevant.
 

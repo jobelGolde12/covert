@@ -1,6 +1,6 @@
-# Folio — Implementation Roadmap
+# Convert — Implementation Roadmap
 
-> **Product:** Folio — document conversion platform.
+> **Product:** Convert — document conversion platform.
 > Phased delivery plan: **Phase 1 MVP** (core conversions), **Phase 2 Advanced** (accounts, OCR, cloud storage, API), **Phase 3 Scale & optimize** (enterprise, SOC 2, multi-region). Timelines assume a team of **4 engineers** (2 full-stack, 1 backend/workers, 1 frontend) + 1 designer/PM part-time.
 
 ---
@@ -99,7 +99,7 @@ Accounts, history, OCR, cloud storage, API keys/webhooks, billing, batch, PWA of
 
 ```mermaid
 gantt
-    title Folio Roadmap
+    title Convert Roadmap
     dateFormat  YYYY-MM-DD
     section Phase 1 — MVP
     Design system + landing     :p1a, 2026-08-17, 14d

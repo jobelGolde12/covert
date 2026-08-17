@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Providers } from "@/components/Providers";
+import { CookieBanner } from "@/components/CookieBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,8 +14,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Folio — Convert documents with style and substance",
-    template: "%s · Folio",
+    default: "Convert — document conversion with style and substance",
+    template: "%s · Convert",
   },
   description:
     "Convert Word, PDF, PowerPoint, Excel, images and more — right in your browser. Browser-side tools keep your files on your device; server conversions are auto-deleted.",
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
         </Providers>
         <Footer />
+        <CookieBanner />
       </body>
     </html>
   );

@@ -42,10 +42,10 @@ describe("markdownToHtml", () => {
 
 describe("convertWithSoffice (real LibreOffice)", () => {
   it("converts text → PDF", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "folio-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "convert-test-"));
     try {
       const input = path.join(dir, "input.txt");
-      await fs.writeFile(input, "Folio conversion test\n\nLine two of the document.");
+      await fs.writeFile(input, "Convert conversion test\n\nLine two of the document.");
       const res = await convertWithSoffice(input, path.join(dir, "out"), "pdf");
       const buf = await fs.readFile(res.outputPath);
       expect(isPdf(buf)).toBe(true);
@@ -55,7 +55,7 @@ describe("convertWithSoffice (real LibreOffice)", () => {
   });
 
   it("converts markdown → PDF via HTML render", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "folio-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "convert-test-"));
     try {
       const htmlPath = path.join(dir, "input.html");
       await fs.writeFile(htmlPath, markdownToHtml("# Title\n\nSome body text."));
@@ -67,7 +67,7 @@ describe("convertWithSoffice (real LibreOffice)", () => {
   });
 
   it("fails cleanly on an unsupported target", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "folio-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "convert-test-"));
     try {
       const input = path.join(dir, "input.txt");
       await fs.writeFile(input, "hello");
@@ -82,7 +82,7 @@ describe("job pipeline (create → process → query → cancel)", () => {
   it("converts a txt file to PDF end-to-end", async () => {
     const fileId = await seedFile({
       name: "hello.txt",
-      content: "Folio end-to-end pipeline test.\nSecond line.",
+      content: "Convert end-to-end pipeline test.\nSecond line.",
       mime: "text/plain",
     });
 
@@ -109,7 +109,7 @@ describe("job pipeline (create → process → query → cancel)", () => {
   });
 
   it("converts docx → pdf (docx produced via LibreOffice)", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "folio-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "convert-test-"));
     let docxBuf: Buffer;
     try {
       const txt = path.join(dir, "doc.txt");
