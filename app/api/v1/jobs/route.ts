@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   }
 
   // anonymous daily conversion quota (documentation/api-documentation.md §2)
-  const daily = await incrementDaily(guard.identity.ip);
+  const daily = await incrementDaily(guard.identity.guestId);
   if (!daily.ok) {
     return apiError("QUOTA_EXCEEDED", `Daily conversion limit reached (${daily.remaining} remaining)`, 402, {
       remaining: daily.remaining,
@@ -66,12 +66,12 @@ export async function POST(request: NextRequest) {
   }
 
   const { job } = created;
-  const enqueued = await enqueueOfficeJob(job.id, { jobId: job.id });
+  const enqueued = await enqueueOfficeJob(job.id, { jobId: job.id, guestId: guard.identity.guestId });
 
   // Always run inline as a fallback — if a BullMQ worker picks it up first,
   // processOfficeJob will see status !== "queued" and exit immediately.
   // This ensures the demo works end-to-end without a separate worker process.
-  void processOfficeJob(job.id).catch(async (err) => {
+  void processOfficeJob(job.id, guard.identity.guestId).catch(async (err) => {
     // If the inline processing crashes before updating the job, mark it as failed
     // so the UI doesn't spin forever.
     try {

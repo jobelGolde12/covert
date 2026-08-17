@@ -22,7 +22,7 @@ const worker = new Worker(
   "office",
   async (job) => {
     console.log(`[office] job ${job.id} started (${job.data.jobId})`);
-    await processOfficeJob(job.data.jobId as string);
+    await processOfficeJob(job.data.jobId as string, job.data.guestId as string | undefined);
     console.log(`[office] job ${job.id} finished`);
   },
   { connection, concurrency: CONCURRENCY }

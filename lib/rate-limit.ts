@@ -122,3 +122,21 @@ export async function incrementDaily(identity: string): Promise<{ ok: boolean; r
 
   return { ok: count <= env.limits.anonConversionsPerDay, remaining: Math.max(0, env.limits.anonConversionsPerDay - count) };
 }
+
+/** Refund a daily quota slot (called when a conversion fails after quota was consumed). */
+export async function decrementDaily(identity: string): Promise<void> {
+  const day = new Date().toISOString().slice(0, 10);
+  const key = `daily:${identity}:${day}`;
+  const r = getRedis();
+
+  if (r) {
+    try {
+      await r.decr(key);
+      return;
+    } catch {
+      /* fall through to memory */
+    }
+  }
+  const arr = mem.get(key);
+  if (arr?.length) arr.pop();
+}

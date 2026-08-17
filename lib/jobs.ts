@@ -9,6 +9,7 @@ import { uuid } from "@/lib/id";
 import { detectFormat, findConversion, extensionFor, type ConversionDef } from "@/lib/conversions";
 import { convertWithSoffice, markdownToHtml, OfficeError } from "@/lib/office";
 import { retentionUntil } from "@/lib/retention";
+import { decrementDaily } from "@/lib/rate-limit";
 
 /**
  * Job orchestration — documentation/architecture.md §3.2.
@@ -107,7 +108,7 @@ async function setTaskProgress(taskId: string, progress: number) {
 }
 
 /** Full office-conversion pipeline for one job. Runs in the worker or inline. */
-export async function processOfficeJob(jobId: string): Promise<void> {
+export async function processOfficeJob(jobId: string, guestId?: string): Promise<void> {
   const job = await prisma.job.findUnique({ where: { id: jobId }, include: { tasks: true } });
   if (!job) throw new Error(`Job ${jobId} not found`);
   if (job.status === "cancelled") return;
@@ -116,7 +117,7 @@ export async function processOfficeJob(jobId: string): Promise<void> {
   const task = job.tasks[0];
   const inputFile = task?.inputFileId ? await prisma.file.findUnique({ where: { id: task.inputFileId } }) : null;
   if (!task || !inputFile) {
-    await failJob(jobId, task?.id ?? null, "OPEN_FAILED", "Input file missing");
+    await failJob(jobId, task?.id ?? null, "OPEN_FAILED", "Input file missing", guestId);
     return;
   }
 
@@ -129,7 +130,7 @@ export async function processOfficeJob(jobId: string): Promise<void> {
   const target = parsedOptions?.outputFormat ?? "pdf";
   const conversion = findConversion(source, target);
   if (!conversion) {
-    await failJob(jobId, task.id, "UNSUPPORTED_CONVERSION", `No conversion from ${source} to ${target}`);
+    await failJob(jobId, task.id, "UNSUPPORTED_CONVERSION", `No conversion from ${source} to ${target}`, guestId);
     return;
   }
 
@@ -180,10 +181,20 @@ export async function processOfficeJob(jobId: string): Promise<void> {
       },
     });
 
-    // Check if job was cancelled during processing
-    const currentJob = await prisma.job.findUnique({ where: { id: jobId } });
-    if (currentJob?.status === "cancelled") {
-      // Clean up the output file we just created
+    // Check if job was cancelled during processing — use conditional updateMany
+    // so the cancel cannot be overwritten by a concurrent worker finish.
+    const jobUpdated = await prisma.job.updateMany({
+      where: { id: jobId, status: { notIn: ["cancelled", "error"] } },
+      data: {
+        status: "done",
+        endedAt: new Date(),
+        creditsCharged: conversion.priceCredits,
+        timingsMs: JSON.stringify({ engineMs: Date.now() - started }),
+      },
+    });
+
+    if (jobUpdated.count === 0) {
+      // Job was cancelled (or errored) during processing — clean up output
       await prisma.file.delete({ where: { id: outId } }).catch(() => {});
       await fs.rm(outputPath!, { force: true }).catch(() => {});
       return;
@@ -192,15 +203,6 @@ export async function processOfficeJob(jobId: string): Promise<void> {
     await prisma.task.update({
       where: { id: task.id },
       data: { status: "finished", progress: 100, endedAt: new Date(), outputFileId: outId },
-    });
-    await prisma.job.update({
-      where: { id: jobId },
-      data: {
-        status: "done",
-        endedAt: new Date(),
-        creditsCharged: conversion.priceCredits,
-        timingsMs: JSON.stringify({ engineMs: Date.now() - started }),
-      },
     });
     await prisma.conversion.create({
       data: {
@@ -220,7 +222,7 @@ export async function processOfficeJob(jobId: string): Promise<void> {
   } catch (err) {
     const code = err instanceof OfficeError ? err.code : "CONVERSION_FAILED";
     const message = err instanceof Error ? err.message : "Conversion failed";
-    await failJob(jobId, task.id, code, message);
+    await failJob(jobId, task.id, code, message, guestId);
   } finally {
     await fs.rm(tmp, { recursive: true, force: true }).catch(() => {});
   }
@@ -235,7 +237,7 @@ function parseTaskOptions(raw: string | null): { outputFormat?: string } | undef
   }
 }
 
-async function failJob(jobId: string, taskId: string | null, code: string, message: string) {
+async function failJob(jobId: string, taskId: string | null, code: string, message: string, guestId?: string) {
   if (taskId) {
     await prisma.task
       .update({ where: { id: taskId }, data: { status: "error", errorCode: code, errorMessage: message, endedAt: new Date() } })
@@ -247,6 +249,10 @@ async function failJob(jobId: string, taskId: string | null, code: string, messa
       data: { status: "error", errorCode: code, errorMessage: message.slice(0, 500), endedAt: new Date() },
     })
     .catch(() => {});
+  // Refund the daily quota slot so failed conversions don't eat the limit
+  if (guestId) {
+    await decrementDaily(guestId).catch(() => {});
+  }
 }
 
 function mimeFor(target: string): string {
@@ -349,14 +355,17 @@ export async function getJobForApi(jobId: string): Promise<JobApi | null> {
 }
 
 export async function cancelJob(jobId: string): Promise<boolean> {
-  const job = await prisma.job.findUnique({ where: { id: jobId }, include: { tasks: true } });
-  if (!job) return false;
-  if (job.status === "done" || job.status === "error" || job.status === "cancelled") return false;
-
   const { getQueue } = await import("@/lib/queue");
   getQueue()?.remove(jobId).catch(() => {});
 
-  await prisma.job.update({ where: { id: jobId }, data: { status: "cancelled", endedAt: new Date() } });
+  // Use conditional updateMany so concurrent cancels and the worker's
+  // finish-write cannot race — only the first transition wins.
+  const updated = await prisma.job.updateMany({
+    where: { id: jobId, status: { notIn: ["done", "error", "cancelled"] } },
+    data: { status: "cancelled", endedAt: new Date() },
+  });
+  if (updated.count === 0) return false;
+
   await prisma.task.updateMany({ where: { jobId }, data: { status: "cancelled", endedAt: new Date() } });
   return true;
 }

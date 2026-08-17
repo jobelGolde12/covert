@@ -24,7 +24,6 @@ export function apiError(
 
 const GUEST_COOKIE = "convert_guest";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 90; // 90 days
-const TRUSTED_PROXIES = ["127.0.0.1", "::1"]; // Only trust X-Forwarded-For from these proxies
 
 export interface Identity {
   guestId: string;
@@ -44,15 +43,9 @@ export function getIdentity(request: NextRequest): Identity {
 }
 
 function clientIp(request: NextRequest): string {
-  const fwd = request.headers.get("x-forwarded-for");
-  if (fwd) {
-    const ip = fwd.split(",")[0].trim();
-    // Only trust X-Forwarded-For from known proxies in production
-    if (env.isProd && ip && !TRUSTED_PROXIES.includes(ip)) {
-      return request.headers.get("x-real-ip") ?? "unknown";
-    }
-    return ip;
-  }
+  // Never trust X-Forwarded-For or X-Real-IP directly — both are
+  // client-controllable headers. Use them only as a last resort for
+  // logging/display; rate limiting keys on guestId, not IP.
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
@@ -65,7 +58,7 @@ export interface RateGuard {
 export async function guardRateLimit(request: NextRequest, opts: { reqLimit?: number; windowSeconds?: number } = {}): Promise<RateGuard | NextResponse> {
   const identity = getIdentity(request);
   const rate = await checkRateLimit(
-    `ip:${identity.ip}`,
+    `guest:${identity.guestId}`,
     opts.windowSeconds ?? 60,
     opts.reqLimit ?? env.limits.anonReqPerMin
   );
