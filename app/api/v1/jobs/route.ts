@@ -68,10 +68,29 @@ export async function POST(request: NextRequest) {
   const { job } = created;
   const enqueued = await enqueueOfficeJob(job.id, { jobId: job.id });
 
-  if (enqueued.mode === "inline") {
-    // No Redis reachable — run in-process so the demo works end-to-end.
-    void processOfficeJob(job.id).catch(() => {});
-  }
+  // Always run inline as a fallback — if a BullMQ worker picks it up first,
+  // processOfficeJob will see status !== "queued" and exit immediately.
+  // This ensures the demo works end-to-end without a separate worker process.
+  void processOfficeJob(job.id).catch(async (err) => {
+    // If the inline processing crashes before updating the job, mark it as failed
+    // so the UI doesn't spin forever.
+    try {
+      const current = await prisma.job.findUnique({ where: { id: job.id } });
+      if (current && current.status === "queued") {
+        await prisma.job.update({
+          where: { id: job.id },
+          data: {
+            status: "error",
+            errorCode: "INTERNAL",
+            errorMessage: err instanceof Error ? err.message : "Conversion failed",
+            endedAt: new Date(),
+          },
+        });
+      }
+    } catch {
+      /* best-effort — nothing more we can do */
+    }
+  });
 
   return apiJson(
     {
